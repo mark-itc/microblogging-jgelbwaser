@@ -1,0 +1,13 @@
+.tweet-container {
+    padding: 1.25rem;
+    background: #343A40;
+border-radius: 6px;
+margin-bottom: 1rem;
+font-size: .875rem;
+line-height: 1.2;
+}
+
+.tweet-header {
+    color: #6C757D;
+    margin-bottom: 1rem;
+}

@@ -1,0 +1,72 @@
+.tweet-form {
+    width: 100%;
+    margin-top: 5px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    position: relative;
+
+}
+
+.tweet-input {
+    padding: 1.25rem 1rem;
+    width: 100%;
+    background-color: transparent;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    height: 11.25rem;
+    resize: none;
+    font-family: 'Roboto', sans-serif;
+font-style: normal;
+font-weight: 400;
+font-size: 1rem;
+line-height: 1.2;
+
+    color: #CCCCCC;
+
+
+}
+
+
+
+.absolute-bottom {
+    line-height: 19px;
+    position: absolute;
+    bottom: 0;
+    padding: 0 10px 20px 20px;
+}
+
+.tweet-btn {width: 68px;
+height: 34px;
+background: #007BFF;
+border-radius: 4px;
+color: white;
+border: none;
+font-size: 1rem;
+margin-left: auto;
+}
+
+.tweet-btn:hover {
+    background-color: #0069D9;
+}
+
+
+.tweet-btn:disabled {
+    background-color: #094E95;
+    color: #8A8F95;
+}
+
+
+
+.tweet-length-warning {
+
+    /* width: 338px;
+    height: 29px;
+    left: 383px;
+    top: 136px; */
+    
+    padding: 7px 4px;
+    background: #F8D7DA;
+    border: 1px solid #F5C6CB;
+    border-radius: 4px;
+    color:#721C24
+}
