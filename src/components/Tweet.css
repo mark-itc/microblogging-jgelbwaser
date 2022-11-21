@@ -11,3 +11,8 @@ line-height: 1.2;
     color: #6C757D;
     margin-bottom: 1rem;
 }
+
+.tweet-text {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
