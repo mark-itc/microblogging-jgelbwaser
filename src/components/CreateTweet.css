@@ -4,8 +4,14 @@
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     position: relative;
-
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 0;
 }
+
+.tweet-form:hover {
+box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;;
+}
+
 
 .tweet-input {
     padding: 1.25rem 1rem;
@@ -22,8 +28,6 @@ font-size: 1rem;
 line-height: 1.2;
 
     color: #CCCCCC;
-
-
 }
 
 
@@ -55,18 +59,12 @@ margin-left: auto;
     color: #8A8F95;
 }
 
+.warning {
 
-
-.tweet-length-warning {
-
-    /* width: 338px;
-    height: 29px;
-    left: 383px;
-    top: 136px; */
-    
     padding: 7px 4px;
     background: #F8D7DA;
     border: 1px solid #F5C6CB;
     border-radius: 4px;
     color:#721C24
 }
+

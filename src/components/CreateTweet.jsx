@@ -1,13 +1,18 @@
 import  './CreateTweet.css';
-import {useState, useRef} from 'react';
+import {useState, useRef, useEffect} from 'react';
 
-function CreateTweet({processSubmit}) {
+function CreateTweet({processSubmit, isSaving, serverError}) {
 
     const maxLengthTweet = 140;
     
     let isButtonDisabled = useRef(true);
     
     const[tweet, setTweet] = useState('');
+    const[errorMsg, setErrorMsg] = useState(serverError);
+
+    useEffect(()=>{setErrorMsg(serverError)},[serverError])
+
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -18,10 +23,15 @@ function CreateTweet({processSubmit}) {
     }
 
 
-
     const handleInputChange = (e) => {
         const tweetTxt = e.target.value;
-        isButtonDisabled.current = !(tweetTxt.length > 0 &&  tweetTxt.length < maxLengthTweet)
+        setErrorMsg('');
+        if(!isSaving) {
+            
+            const validTweetLength = (tweetTxt.length > 0 &&  tweetTxt.length < maxLengthTweet);
+            isButtonDisabled.current = !validTweetLength;
+            (validTweetLength || tweetTxt.length <= 0) ? setErrorMsg('') : setErrorMsg(`The tweet can't contain more than ${maxLengthTweet} chars.`);
+        }     
         setTweet(tweetTxt);
         
     }
@@ -37,12 +47,13 @@ function CreateTweet({processSubmit}) {
 
             </textarea >
             <div className='flex-space-between absolute-bottom'>
-                {tweet.length >= maxLengthTweet &&
-                <div className='tweet-length-warning'>
-                The tweet can't contain more than {maxLengthTweet} chars.
+                {errorMsg &&
+                <div className='tweet-length warning'>
+                {errorMsg}
                 </div>}
                 <button 
-                className='tweet-btn' disabled={isButtonDisabled.current}  type='submit'>Tweet</button>
+                className='tweet-btn' disabled={isButtonDisabled.current}  type='submit'>
+                    {isSaving ? 'Saving..' : 'Tweet'}</button>
             </div>
         </form>
     )
