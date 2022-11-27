@@ -1,16 +1,16 @@
 import  './CreateTweet.css';
 import {useState, useRef, useEffect} from 'react';
 
-function CreateTweet({processSubmit, isSaving, serverError}) {
+function CreateTweet({processSubmit, isSaving, appError}) {
 
     const maxLengthTweet = 140;
     
     let isButtonDisabled = useRef(true);
     
     const[tweet, setTweet] = useState('');
-    const[errorMsg, setErrorMsg] = useState(serverError);
+    const[errorMsg, setErrorMsg] = useState(appError);
 
-    useEffect(()=>{setErrorMsg(serverError)},[serverError])
+    useEffect(()=>{setErrorMsg(appError)},[appError])
 
 
 
@@ -39,7 +39,7 @@ function CreateTweet({processSubmit, isSaving, serverError}) {
     return (
         <form className='tweet-form' onSubmit={handleSubmit}>
             <textarea
-            className='tweet-input'
+            className='tweet-input form-input'
             placeholder='What you have in mind...'
             onInput={handleInputChange}
             value= {tweet}
@@ -52,8 +52,8 @@ function CreateTweet({processSubmit, isSaving, serverError}) {
                 {errorMsg}
                 </div>}
                 <button 
-                className='tweet-btn' disabled={isButtonDisabled.current}  type='submit'>
-                    {isSaving ? 'Saving..' : 'Tweet'}</button>
+                className='submit-btn' disabled={isButtonDisabled.current}  type='submit'>
+                    {isSaving || errorMsg ? 'Saving..' : 'Tweet'}</button>
             </div>
         </form>
     )

@@ -1,8 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
+:root {
+  --color-bg-app: #15202B;
+  --color-bg-element: #343A40;
+  --color-txt-date: #6C757D;
+  --white: #ffffff;
+  --color-nav-li-active: rgba(255,255,255,.5);
+  --color-bg-button:  #007BFF;
+  --color-bg-button-hover: #0069D9;
+  --color-bg-button-disabled: #094E95;
+
+}
+
+
+
 body {
   margin: 0;
-  background-color: #15202B;
+  background-color: var(--color-bg-app);
   color:white;
   font-family: 'Roboto', sans-serif;
   font-weight: 400;

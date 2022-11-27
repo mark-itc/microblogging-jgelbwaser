@@ -1,0 +1,23 @@
+.profile-section {
+    margin-top: 3.25rem;
+}
+
+.form-user {
+    margin-top: 1.625rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.label-username {
+    opacity: .8;
+    font-size: 1.12;
+    margin-bottom: .375rem;
+}
+
+.username-input {
+    color: white;
+}
+
+.user-form-button {
+    margin-top: 1rem;
+}

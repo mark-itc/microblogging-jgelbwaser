@@ -2,26 +2,47 @@ import './Main.css';
 import CreateTweet from '../components/CreateTweet';
 import Tweet from '../components/Tweet';
 import { useEffect, useState } from 'react';
+//import LocalForage from 'localforage';
+import {Link} from 'react-router-dom'
 
 
 
-function Main() {
+function Main({user}) {
 
     
     const [isSaving, setIsSaving] = useState(false);
-    const [serverError, setServerError] = useState('');
+    const [appError, setAppError] = useState(null);
     const [tweets, setTweets] = useState([]);
+    //const [user, setUser] = useState('');
 
     const url = 'https://micro-blogging-dot-full-stack-course-services.ew.r.appspot.com/tweet';
-    const username = 'test-admin';
+    
+   
     //const date = new Date
 
+    // useEffect( ()=> {
+    //     const getLocalUser = async () => {
+    //         const localSavedUser = await(LocalForage.getItem('user'));
+    //         setUser(localSavedUser)
+    //     }
+    //     getLocalUser();
+    // }, [user]
+    // )
+    
+
     const addTweet = async (tweetTxt) => {
-        setServerError();
+        
+        if(!user) {
+            const userError =  <>No user found. Please <Link to='/user'>Log in</Link></>;
+            setAppError(userError);
+            return
+        } else {
+            setAppError(null)
+        }
         setIsSaving(true);
         const tweet = {
             content: tweetTxt,
-            userName: username,
+            userName: user,
             date: new Date().toISOString(),
         }
         const response = await addServerTweet(tweet);
@@ -30,8 +51,7 @@ function Main() {
         newTweetArray.unshift(tweet);
         setTweets(newTweetArray);
         }
-        setIsSaving(false);
-        
+        setIsSaving(false);   
     }
 
 
@@ -56,7 +76,7 @@ function Main() {
             return data;
 
         } catch (error) {
-            setServerError(error);
+            setAppError(error);
             return null;
         }
 
@@ -77,7 +97,7 @@ function Main() {
             data && setTweets(data.tweets);
         } catch (error) {
             console.log(error);
-            setServerError(error);
+            setAppError(error);
 
         }
     }
@@ -90,11 +110,11 @@ function Main() {
 
 
     return (
-        <>
+        <section className='main-section'>
             <CreateTweet
                 processSubmit={addTweet}
                 isSaving={isSaving}
-                serverError = {serverError}               
+                appError = {appError}               
             />
             <div className='tweet-list'>
 
@@ -106,7 +126,7 @@ function Main() {
                         date={date} />
                 })}
             </div>
-        </>
+        </section>
 
 
     )

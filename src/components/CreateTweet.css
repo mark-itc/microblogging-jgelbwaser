@@ -13,20 +13,10 @@ box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;;
 }
 
 
-.tweet-input {
-    padding: 1.25rem 1rem;
-    width: 100%;
-    background-color: transparent;
-    border: 2px solid #ccc;
-    border-radius: 6px;
+
+.tweet-input {   
     height: 11.25rem;
     resize: none;
-    font-family: 'Roboto', sans-serif;
-font-style: normal;
-font-weight: 400;
-font-size: 1rem;
-line-height: 1.2;
-
     color: #CCCCCC;
 }
 
@@ -39,25 +29,8 @@ line-height: 1.2;
     padding: 0 10px 20px 20px;
 }
 
-.tweet-btn {width: 68px;
-height: 34px;
-background: #007BFF;
-border-radius: 4px;
-color: white;
-border: none;
-font-size: 1rem;
-margin-left: auto;
-}
-
-.tweet-btn:hover {
-    background-color: #0069D9;
-}
 
 
-.tweet-btn:disabled {
-    background-color: #094E95;
-    color: #8A8F95;
-}
 
 .warning {
 
