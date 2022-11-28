@@ -1,31 +1,32 @@
 
-import {useState} from 'react';
+import { useState, useEffect, useContext } from 'react';
 import './User.css';
-import { useEffect } from 'react';
-
-function User({user, processSubmit}) {
+import { UserContext } from '../context/UserContext';
 
 
+function User({ processSubmit }) {
+
+    const { user, loginUser } = useContext(UserContext);
 
     const [userInput, setUserInput] = useState(user);
 
-    const handleSubmit = (e)=> {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        processSubmit(userInput);
-      }
-      
-      useEffect(()=>{
+        loginUser(userInput);
+    }
+
+    useEffect(() => {
         setUserInput(user);
-      },
-      [user])
+    },
+        [user])
 
 
     return (
         <section className="profile-section">
             <h1>Profile</h1>
-            <form 
-            className='form-user'
-            onSubmit={(e)=>{handleSubmit(e)}}
+            <form
+                className='form-user'
+                onSubmit={(e) => { handleSubmit(e) }}
             >
                 <label
                     className='label-username'
@@ -33,15 +34,15 @@ function User({user, processSubmit}) {
                 </label>
                 <input
                     value={userInput}
-                    onChange={(e)=> {setUserInput(e.target.value)}}
+                    onChange={(e) => { setUserInput(e.target.value) }}
                     className='form-input username-input'
                     id='username-input'
                     placeholder="Enter a username"
                     type='text'></input>
-                <button 
-                disabled= {userInput ? false : true }
-                className='submit-btn user-form-button' 
-                type='submit'
+                <button
+                    disabled={userInput ? false : true}
+                    className='submit-btn user-form-button'
+                    type='submit'
                 >Log in</button>
             </form>
         </section>
