@@ -34,7 +34,7 @@ function User({ processSubmit }) {
                 </label>
                 <input
                     value={userInput}
-                    onChange={(e) => { setUserInput(e.target.value) }}
+                    onChange={(e) => { setUserInput(e.target.value.trim()) }}
                     className='form-input username-input'
                     id='username-input'
                     placeholder="Enter a username"

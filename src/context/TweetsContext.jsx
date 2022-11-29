@@ -16,22 +16,27 @@ function TweetsContextProvider({ children }) {
 
     const { user } = useContext(UserContext);
 
-    //const user = 'admin1'
+    const isUserSet = () => {
+        if (!user) {
+            console.log('is-user-set');
+            const userError = <>No user found. Please <Link to='/user'>Log in</Link></>;
+            setAppError(userError);
+            return false
+        } else {
+            return true
+        }
+    }
 
 
 
     const addTweet = async (tweetTxt) => {
-
-        if (!user) {
-            const userError = <>No user found. Please <Link to='/user'>Log in</Link></>;
-            setAppError(userError);
-            return
-        } else {
-            setAppError(null)
-        }
+        setAppError(null);
         setIsSaving(true);
+        if(!isUserSet())  return (setIsSaving(false));
+        const tweetTxtCleanedWhiteSpace = tweetTxt.replace(/\s\s+/g, ' ');
+        const tweetTxtTrimmed = tweetTxtCleanedWhiteSpace.trim();
         const tweet = {
-            content: tweetTxt,
+            content: tweetTxtTrimmed,
             userName: user,
             date: new Date().toISOString(),
         }

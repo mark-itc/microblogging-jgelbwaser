@@ -2,7 +2,7 @@ import './Tweet.css'
 
 function Tweet({content, userName, date}) {
 
-
+    const contentWithoutExtraSpace  = content.replace(/\s\s+/g, ' ');
 
     return (
         <div className='tweet-container'>
@@ -11,7 +11,7 @@ function Tweet({content, userName, date}) {
                 <span>{date}</span>
             </div>
             <div className='tweet-text'>
-            {content}
+            {contentWithoutExtraSpace}
             </div>
         </div>
     )
