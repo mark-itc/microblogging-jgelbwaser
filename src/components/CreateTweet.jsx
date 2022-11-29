@@ -31,7 +31,6 @@ function CreateTweet() {
         const tweetTxt = e.target.value;
         setErrorMsg('');
         if (!isSaving) {
-
             const validTweetLength = (tweetTxt.length > 0 && tweetTxt.length < maxLengthTweet);
             isButtonDisabled.current = !validTweetLength;
             (validTweetLength || tweetTxt.length <= 0) ? setErrorMsg('') : setErrorMsg(`The tweet can't contain more than ${maxLengthTweet} chars.`);
@@ -39,6 +38,7 @@ function CreateTweet() {
         setTweetTxtInput(tweetTxt);
 
     }
+    //hi
 
     return (
         <form className='tweet-form' onSubmit={handleSubmit}>
