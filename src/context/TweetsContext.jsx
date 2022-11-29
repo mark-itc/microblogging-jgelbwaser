@@ -16,27 +16,36 @@ function TweetsContextProvider({ children }) {
 
     const { user } = useContext(UserContext);
 
-    const isUserSet = () => {
+
+    const isUserSet =  () => {
+
         if (!user) {
-            console.log('is-user-set');
             const userError = <>No user found. Please <Link to='/user'>Log in</Link></>;
             setAppError(userError);
-            return false
+            return
         } else {
             return true
         }
     }
 
+    const removeTxtExtraWhiteSpace = (txt) => { 
+        if(txt.trim().length === 0) {
+            setAppError(`Please write some text in order to Tweet`);
+            return false
+        }
+        const txtCleanedWhiteSpace = txt.replace(/\s\s+/g, ' ').trim();
+        return txtCleanedWhiteSpace
+    }
 
 
     const addTweet = async (tweetTxt) => {
         setAppError(null);
         setIsSaving(true);
         if(!isUserSet())  return (setIsSaving(false));
-        const tweetTxtCleanedWhiteSpace = tweetTxt.replace(/\s\s+/g, ' ');
-        const tweetTxtTrimmed = tweetTxtCleanedWhiteSpace.trim();
+        const tweetTxtWhiteSpaceClean = removeTxtExtraWhiteSpace(tweetTxt)
+        if(!tweetTxtWhiteSpaceClean) return (setIsSaving(false));
         const tweet = {
-            content: tweetTxtTrimmed,
+            content: tweetTxtWhiteSpaceClean,
             userName: user,
             date: new Date().toISOString(),
         }

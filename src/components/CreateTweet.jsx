@@ -21,11 +21,6 @@ function CreateTweet() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(tweetTxtInput.trim().length === 0) {
-            setErrorMsg(`Please write some text in order to Tweet`);
-            return
-        }
-        //const textWithoutExtraWhitespace = tweetTxtInput.replace(/\s\s+/g, ' ');
         addTweet(tweetTxtInput)
         setTweetTxtInput('');
         isButtonDisabled.current = true;
