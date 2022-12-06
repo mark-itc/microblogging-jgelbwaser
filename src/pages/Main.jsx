@@ -16,9 +16,9 @@ function Main({user}) {
             <CreateTweet />
             <div className='tweet-list'>
 
-                {tweets.map(({ userName, content, date }, index) => {
+                {tweets.map(({ userName, content, date, id }) => {
                     return <Tweet
-                        key={index}
+                        key={id}
                         userName={userName}
                         content={content}
                         date={date} />

@@ -57,7 +57,7 @@ function CreateTweet() {
                     </div>}
                 <button
                     className='submit-btn' disabled={isButtonDisabled.current} type='submit'>
-                    {isSaving ? 'Saving..' : 'Tweet'}</button>
+                    {isSaving ? 'Saving...' : 'Tweet'}</button>
             </div>
         </form>
     )
