@@ -9,7 +9,6 @@ import {TweetsContext} from '../context/TweetsContext'
 function Main({user}) {
 
     const {tweets} = useContext(TweetsContext);
- 
 
     return (
         <section className='main-section'>
