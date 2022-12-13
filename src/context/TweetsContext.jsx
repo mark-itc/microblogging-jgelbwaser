@@ -1,10 +1,10 @@
 
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
-import { UserContext } from "./UserContext";
+import { useUser } from "./UserContext";
 // SWITCH SERVER DB: firebase: "../lib/apiFirebase"  OR FS Course server: "../lib/apiServerFsCourse" 
-import { addServerTweet, getRealTimeTweets, getServerTweets } from "../lib/apiFirebase"
+import { addServerTweet, getRealTimeTweets, getServerTweets } from "../lib/apiFirebaseDb"
 
 
 const INTERVAL_BETWEEN_TWEET_UPDATES = 1000;
@@ -20,11 +20,11 @@ function TweetsContextProvider({ children }) {
     const [tweets, setTweets] = useState([]);
 
 
-    const { user } = useContext(UserContext);
+    const { currentUser } = useUser;
 
 
     const isUserSet = () => {
-        if (!user) {
+        if (!currentUser) {
             const userError = <>No user found. Please <Link to='/user'>Log in</Link></>;
             setAppError(userError);
             return
@@ -50,7 +50,7 @@ function TweetsContextProvider({ children }) {
         if (!tweetTxtWhiteSpaceClean) return (setIsSaving(false));
         const tweet = {
             content: tweetTxtWhiteSpaceClean,
-            userName: user,
+            userName: currentUser,
             date: new Date().toISOString(),
         }
         const response = await addServerTweet(tweet, setAppError);//addServerTweet(tweet);
@@ -80,8 +80,8 @@ function TweetsContextProvider({ children }) {
 
 
     useEffect(() => {
-        user && setAppError('');
-    }, [user])
+        currentUser && setAppError('');
+    }, [currentUser])
 
 
     return (

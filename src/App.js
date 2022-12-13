@@ -2,16 +2,18 @@
 import './App.css';
 import Main from './pages/Main';
 import User from './pages/User';
+import SignUp from './pages/SignUp'
+import Login from './pages/Login';
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { UserContext } from './context/UserContext';
-import { useContext } from 'react';
+import { useUser } from './context/UserContext';
 
 
 
 function App() {
 
 
-  const { user, logoutUser } = useContext(UserContext);
+  const { currentUser, logoutUser } = useUser();
+  
 
   return (
 
@@ -21,19 +23,25 @@ function App() {
         <NavLink className="nav-link" to='/user'>Profile</NavLink>
         <div className='login-nav'>
           {
-            user ? <>
-              <span className='nav-greeting'>Hi {user} ! </span>
+            currentUser ? <>
+              <span className='nav-greeting'>Hi {currentUser.userName} ! </span>
               <span className='logout-link nav-link' onClick={logoutUser}>Logout</span>
             </> :
-              <NavLink className="nav-link" to='/user'>Log In</NavLink>
+            <>
+              <NavLink className="nav-link" to='/login'>Log In</NavLink> 
+                
+              <NavLink className="nav-link last-link" to='/signup'>Sign up</NavLink>
+            </>
           }
 
         </div>
       </nav>
       <div className="container">
         <Routes>
-          <Route path='/' element={<Main user={user} />}></Route>
-          <Route path='/user' element={<User user={user} />}></Route>
+          <Route path='/' element={<Main />}></Route>
+          <Route path='/user' element={<User  />}></Route>
+          <Route path='/signup' element={<SignUp  />}></Route>
+          <Route path='/login' element={<Login />}></Route>
         </Routes>
 
       </div>

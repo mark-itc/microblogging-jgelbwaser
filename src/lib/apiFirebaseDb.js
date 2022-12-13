@@ -2,7 +2,7 @@ import {
     collection, getDocs, addDoc,
     onSnapshot, query, orderBy, serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../lib/init-firebase";
+import { db } from "./init-firebase";
 
 const ERROR_TWEET_ID_MISSING = "id missing in server response, can't confirmed  tweet was saved"
 
@@ -27,7 +27,7 @@ export const addServerTweet = async (tweetData, updateStateError) => {
 export const getServerTweets = async (updateStateTweets, updateStateError) => {
     console.log('get server called')
     try {
-        const response = await getDocs(tweetsColRef);
+        const response = await getDocs(queryFireStore);
         const dbTweets = response.docs.map(doc => {
             return { ...doc.data(), id: doc.id }
         })

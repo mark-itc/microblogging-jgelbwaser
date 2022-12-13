@@ -1,12 +1,12 @@
 
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import './User.css';
-import { UserContext } from '../context/UserContext';
+import { useUser } from '../context/UserContext';
 
 
-function User({ processSubmit }) {
+function User() {
 
-    const { user, loginUser } = useContext(UserContext);
+    const { user, loginUser } =useUser;
 
     const [userInput, setUserInput] = useState(user);
 
@@ -22,26 +22,28 @@ function User({ processSubmit }) {
 
 
     return (
-        <section className="profile-section">
+        <section className="section">
             <h1>Profile</h1>
             <form
-                className='form-user'
+                className='form'
                 onSubmit={(e) => { handleSubmit(e) }}
             >
-                <label
-                    className='label-username'
-                    htmlFor="username-input">User Name
-                </label>
-                <input
-                    value={userInput}
-                    onChange={(e) => { setUserInput(e.target.value.trim()) }}
-                    className='form-input username-input'
-                    id='username-input'
-                    placeholder="Enter a username"
-                    type='text'></input>
+                <div className='form-group'>
+                    <label
+                        className='form-label'
+                        htmlFor="username-input">User Name
+                    </label>
+                    <input
+                        value={userInput}
+                        onChange={(e) => { setUserInput(e.target.value.trim()) }}
+                        className='form-input'
+                        id='username-input'
+                        placeholder="Enter a username"
+                        type='text'></input>
+                </div>
                 <button
                     disabled={userInput ? false : true}
-                    className='submit-btn user-form-button'
+                    className='submit-btn form-button'
                     type='submit'
                 >Log in</button>
             </form>
