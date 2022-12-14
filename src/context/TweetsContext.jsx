@@ -20,15 +20,16 @@ function TweetsContextProvider({ children }) {
     const [tweets, setTweets] = useState([]);
 
 
-    const { currentUser } = useUser;
+    const { currentUser } = useUser();
 
 
     const isUserSet = () => {
-        if (!currentUser) {
+        if (!currentUser) {      
             const userError = <>No user found. Please <Link to='/user'>Log in</Link></>;
             setAppError(userError);
             return
         } else {
+            console.log(currentUser)
             return true
         }
     }

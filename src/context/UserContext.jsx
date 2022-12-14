@@ -3,7 +3,7 @@ import LocalForage from 'localforage';
 import { useNavigate } from 'react-router-dom';
 import {registerWithEmailAndPassword, logout,
     logInWithEmailAndPassword, getUsers,
-   signInWithGoogle
+   signInWithGoogle, getRealTimeAuthChanges
 } from '../lib/init-firebase';
 
 
@@ -18,79 +18,136 @@ export const useUser =  () => useContext(UserContext);
 export function UserContextProvider({ children }) {
 
     const [currentUser, setCurrentUser] = useState(null);
+    const [usernameInput, setUsernameInput] = useState(null);
     const [allUsers, setAllUsers] = useState(null);
     const [authError, setAuthError] = useState(null);
-    const [localEmail, setLocalEmail] = useState(null);
+    const [localEmail, setLocalEmail] = useState('');
    
     const navigate = useNavigate();
 
-  
 
-    useEffect(() => {
-        const getLocalEmail = async () => {
-            const localSavedEmail = await LocalForage.getItem('user-email');
-            localSavedEmail && setLocalEmail(localSavedEmail);
-        }
-        getLocalEmail();
-    }, [])
-
+ 
 
     const loginUserWithGoogle = async() =>{
-        setAuthError(null);
-        const res = await signInWithGoogle()
-        if(res && res.error) {return setAuthError(res.error)} 
-        res.user && setCurrentUser(res.user);    
-        await setDbUsers()
-        LocalForage.setItem('user-email', res.user.email);
-        navigate('/');
+        try {
+            setAuthError(null);
+            await signInWithGoogle();
+            // const res = await signInWithGoogle();
+            // setCurrentUser(res);    
+            // await getUsersFromDB()
+            navigate('/'); 
+        } catch (error) {
+            handleError(error)
+        }
     }
 
+    
+    const handleError = (error) => {
+        console.log(error);
+        setAuthError(error.message);
+    }
+
+   
+
+    const onLogoutUser = () => {
+        console.log('onLogout');
+        setCurrentUser(null);
+        setAllUsers(null)
+    }
+    
+    
     const loginUser = async (email, pwd) => {
-        setAuthError(null);
-        const res = await logInWithEmailAndPassword(email, pwd);
-        if(res && res.error) {return setAuthError(res.error)} 
-        const usersDB = await setDbUsers();
-        const loggedInUser = usersDB[res.uid];
-        setCurrentUser(loggedInUser);  
-        await LocalForage.setItem('user-email', email);
-        navigate('/');  
+        try {
+            setAuthError(null);
+            await logInWithEmailAndPassword(email, pwd);
+            //const res = await logInWithEmailAndPassword(email, pwd);
+            //const usersDB = await getUsersFromDB();
+           // const loggedInUser = usersDB[res.uid];
+            //setCurrentUser(loggedInUser);  
+            //await LocalForage.setItem('user-email', email);
+            navigate('/'); 
+        } catch (error) {
+            handleError(error)
+        }       
     }
 
-    const setDbUsers = async () => {
-        const usersDB = await getUsers();
-        if(usersDB.error) {return setAuthError(usersDB.error)}
-        setAllUsers(usersDB.users);
-        return usersDB.users
+    
+
+
+    const getUsersFromDB = async () => {
+            const usersDB = await getUsers();
+            setAllUsers(usersDB);   
+            return usersDB;
     }
+
 
     const signUpUser = async (userName, email, password) => {
-        setAuthError(null);
-        const res = await registerWithEmailAndPassword(userName, email, password);
-        if(res && res.error) {return setAuthError(res.error)}
-        res.user && setCurrentUser(res.user);    
-        await setDbUsers()
-        LocalForage.setItem('user-email', email);
-        navigate('/');
+        try {
+            setUsernameInput(userName);
+            await registerWithEmailAndPassword(userName, email, password);
+            //const newUser = await registerWithEmailAndPassword(userName, email, password);
+            //setCurrentUser(newUser);    
+            //await getUsersFromDB()
+            //LocalForage.setItem('user-email', email);
+            navigate('/');
+        } catch (error) {
+            handleError(error)
+        }
     }
 
   
     const logoutUser = async () => {
         logout();
-        await LocalForage.setItem('user-email', '');
-        setCurrentUser('')
+        setCurrentUser(null);
     }
 
-    const value ={
-        currentUser, 
-        authError,
-        localEmail,
-        allUsers,
-        loginUser, 
-        setAuthError, 
-        signUpUser,
-        logoutUser,
-        loginUserWithGoogle
-        }
+  
+
+        useEffect(()=>{
+            try {
+
+            const onLoginUser = async (userDataDB) => {
+                    //const loggedInUser = await getUserWithId(uid)
+                    setCurrentUser(userDataDB); 
+                    //console.log(loggedInUser)
+                    //console.log('loggedInUser.authProvider', loggedInUser.authProvider, loggedInUser.email)
+                    if(userDataDB.authProvider !== 'google.com') {
+                       await LocalForage.setItem('user-email', userDataDB.email);
+                     }
+                     const users = await getUsersFromDB();
+                     console.log(users);
+                    
+             }
+
+            const unsubAuth = getRealTimeAuthChanges(
+                onLoginUser, onLogoutUser, usernameInput
+            );
+            return () => {unsubAuth()}
+            } catch (error) {
+              handleError(error)
+            }
+        },[usernameInput])
+
+        useEffect(() => {
+            const getLocalEmail = async () => {
+                const localSavedEmail = await LocalForage.getItem('user-email');
+                localSavedEmail && setLocalEmail(localSavedEmail);
+            }
+            getLocalEmail();
+        }, [currentUser])
+
+        const value ={
+            currentUser, 
+            authError,
+            localEmail,
+            allUsers,
+            loginUser, 
+            setAuthError, 
+            signUpUser,
+            logoutUser,
+            loginUserWithGoogle
+            }
+    
 
     return (
         <UserContext.Provider value={value}>

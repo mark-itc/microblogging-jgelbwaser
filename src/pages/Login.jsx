@@ -8,11 +8,11 @@ import GoogleButton from 'react-google-button';
 function Login() {
 
     const form = useRef();
-    const { loginUser, authError, loginUserWithGoogle } = useUser();
+    const { loginUser, authError, loginUserWithGoogle,localEmail } = useUser();
 
 
     const [pwdInput, setPwdInput] = useState('');
-    const [emailInput, setEmailInput] = useState('');
+    const [emailInput, setEmailInput] = useState(localEmail);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState(authError);
 
@@ -33,7 +33,7 @@ function Login() {
 
     useEffect(()=> {setError(authError)},[authError])
     useEffect(() => {setError(null)}, [pwdInput, emailInput])
-    
+    useEffect(()=>{if(localEmail) {setEmailInput(localEmail)}},[localEmail])
     
 
     return (
