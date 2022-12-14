@@ -25,7 +25,7 @@ function TweetsContextProvider({ children }) {
 
     const isUserSet = () => {
         if (!currentUser) {      
-            const userError = <>No user found. Please <Link to='/user'>Log in</Link></>;
+            const userError = <>No user found. Please <Link to='/login'>Log in</Link></>;
             setAppError(userError);
             return
         } else {
@@ -51,8 +51,9 @@ function TweetsContextProvider({ children }) {
         if (!tweetTxtWhiteSpaceClean) return (setIsSaving(false));
         const tweet = {
             content: tweetTxtWhiteSpaceClean,
-            userName: currentUser,
+            userName: currentUser.userName,
             date: new Date().toISOString(),
+            uid: currentUser.uid
         }
         const response = await addServerTweet(tweet, setAppError);//addServerTweet(tweet);
         if (response) {
