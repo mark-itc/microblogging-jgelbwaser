@@ -1,5 +1,5 @@
 import {
-    collection, getDocs, addDoc,
+    collection, addDoc,
     onSnapshot, query, orderBy, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "./init-firebase";
@@ -24,28 +24,23 @@ export const addServerTweet = async (tweetData, updateStateError) => {
     }
 }
 
-export const getServerTweets = async (updateStateTweets, updateStateError) => {
-    console.log('get server called')
-    try {
-        const response = await getDocs(queryFireStore);
-        const dbTweets = response.docs.map(doc => {
-            return { ...doc.data(), id: doc.id }
-        })
-        console.log("dbTweets", dbTweets);
-        updateStateTweets(dbTweets);
-        
-    } catch (error) {
-        console.log(error);
-        updateStateError(error.message)
-    }
+
+const addUserData = (tweetDataDB, usersMap) => {
+    if (!tweetDataDB.uid) return tweetDataDB
+    const uid = tweetDataDB.uid;
+    const {userName, photoURL}  = usersMap[uid];
+    return {...tweetDataDB, userName, photoURL }
 }
 
-
-export const getRealTimeTweets = (updateStateTweets, updateStateError) => {
+export const getRealTimeTweets = (updateStateTweets, updateStateError, usersMap) => {
     try { 
         const unsubscribe = onSnapshot(queryFireStore, snapshot => {
             const dbTweets = snapshot.docs.map(doc => {
-                return { ...doc.data(), id: doc.id }
+                console.log('doc-data', doc.data())
+                const tweetDataDB = { ...doc.data(), id: doc.id }
+                const tweetWithUserData = addUserData(tweetDataDB, usersMap);
+                console.log(tweetWithUserData)
+                return {...tweetWithUserData}
             })
             updateStateTweets(dbTweets);
         });

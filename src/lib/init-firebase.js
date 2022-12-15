@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, query, getDocs, collection, where, addDoc } from "firebase/firestore";
+import { getFirestore, query, getDocs, collection, where, addDoc, onSnapshot } from "firebase/firestore";
 import {
   getAuth, GoogleAuthProvider, signInWithPopup,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
@@ -24,27 +24,14 @@ const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 const auth = getAuth(app);
+const usersColRef = collection(db, "users");
 const googleProvider = new GoogleAuthProvider();
 
 
-const getUsers = async () => {
-  const users = {};
-  const usersColRef = collection(db, "users");
-  const response = await getDocs(usersColRef);
-  response.docs.forEach(doc => {
-    const userDb = doc.data();
-    users[userDb.uid] = {
-      userName: userDb.userName,
-      photoURL: userDb.photoURL,
-      uid: userDb.uid
-    };
-  });
-  return { ...users }
-}
 
 
 const getUserWithId = async (id) => {
-  const q = query(collection(db, "users"), where("uid", "==", id));
+  const q = query(usersColRef, where("uid", "==", id));
   const response = await getDocs(q);
   if (response.docs.length === 0) return;
   if (response.docs.length > 1) {
@@ -94,7 +81,7 @@ const getRealTimeAuthChanges = (onLogin, onLogout, usernameInput) => {
           email: user.email,
           photoURL: user.photoURL
         }
-        await addDoc(collection(db, "users"), userDataDB)
+        await addDoc(usersColRef, userDataDB)
       }
       await onLogin(userDataDB);
     } else {
@@ -106,6 +93,24 @@ const getRealTimeAuthChanges = (onLogin, onLogout, usernameInput) => {
 }
 
 
+const getRealTimeUsers = (setAllUsers) => {
+      const unsubscribe = onSnapshot(usersColRef, snapshot => {
+          const users = {}
+          snapshot.docs.forEach(doc => {
+            const userDb = doc.data();
+            users[userDb.uid] = {
+              userName: userDb.userName,
+              photoURL: userDb.photoURL,
+              uid: userDb.uid
+            };
+          });
+          setAllUsers(users);
+          console.log(users);
+      });
+      return () => { unsubscribe() };
+}
+
+
 export {
   auth,
   signInWithGoogle,
@@ -113,7 +118,7 @@ export {
   registerWithEmailAndPassword,
   sendPasswordReset,
   logout,
-  getUsers,
   getRealTimeAuthChanges,
-  getUserWithId
+  getUserWithId,
+  getRealTimeUsers,
 };

@@ -3,11 +3,9 @@
 import { createContext, useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { useUser } from "./UserContext";
-// SWITCH SERVER DB: firebase: "../lib/apiFirebase"  OR FS Course server: "../lib/apiServerFsCourse" 
-import { addServerTweet, getRealTimeTweets, getServerTweets } from "../lib/apiFirebaseDb"
+import { addServerTweet, getRealTimeTweets } from "../lib/apiFirebaseDb"
 
 
-const INTERVAL_BETWEEN_TWEET_UPDATES = 1000;
 const ERROR_TWEET_WITHOUT_TEXT = "Please write some text in order to Tweet";
 
 
@@ -20,7 +18,7 @@ function TweetsContextProvider({ children }) {
     const [tweets, setTweets] = useState([]);
 
 
-    const { currentUser } = useUser();
+    const { currentUser, usersMap } = useUser();
 
 
     const isUserSet = () => {
@@ -51,14 +49,16 @@ function TweetsContextProvider({ children }) {
         if (!tweetTxtWhiteSpaceClean) return (setIsSaving(false));
         const tweet = {
             content: tweetTxtWhiteSpaceClean,
-            userName: currentUser.userName,
             date: new Date().toISOString(),
             uid: currentUser.uid
         }
-        const response = await addServerTweet(tweet, setAppError);//addServerTweet(tweet);
-        if (response) {
+        const addedTweet = await addServerTweet(tweet, setAppError);//addServerTweet(tweet);
+        if (addedTweet) {
             const newTweetArray = [...tweets];
-            newTweetArray.unshift(response);
+            newTweetArray.unshift({ ...addedTweet, 
+                userName: currentUser.userName, 
+                photoURL: currentUser.photoURL,
+            });
             setTweets(newTweetArray);
         }
         setIsSaving(false);
@@ -67,18 +67,12 @@ function TweetsContextProvider({ children }) {
 
     useEffect(() => {
         let disconnect;
-        if (getRealTimeTweets) {
-            disconnect = getRealTimeTweets(setTweets, setAppError);
-        } else {
-                const timer = setInterval( async ()=> {
-                    getServerTweets(setTweets, setAppError);
-                }, INTERVAL_BETWEEN_TWEET_UPDATES)
-                disconnect = () => clearInterval(timer);
-        }
+        if(!currentUser || !usersMap) return
+            disconnect = getRealTimeTweets(setTweets, setAppError, usersMap); 
         return (
             () => { disconnect() }
         )
-    }, []);
+    }, [usersMap, currentUser]);
 
 
     useEffect(() => {
