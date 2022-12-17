@@ -1,8 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore, query, getDocs, collection, where, addDoc, onSnapshot } from "firebase/firestore";
-import {
-  getAuth, GoogleAuthProvider, signInWithPopup,
+import {getStorage, ref, uploadBytes, getDownloadURL,} from 'firebase/storage'
+
+import {getAuth, GoogleAuthProvider, signInWithPopup,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
   sendPasswordResetEmail, signOut, onAuthStateChanged
 } from "firebase/auth";
@@ -18,7 +19,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+ const app = initializeApp(firebaseConfig);
+
 
 // Initialize Firestore
 
@@ -66,7 +68,7 @@ const logout = () => {
 };
 
 
-const getRealTimeAuthChanges = (onLogin, onLogout, usernameInput) => {
+const getRealTimeAuthChanges = (onLogin, onLogout, usernameInput, userPicture) => {
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
     
     // User is signed in
@@ -79,7 +81,7 @@ const getRealTimeAuthChanges = (onLogin, onLogout, usernameInput) => {
           userName: user.displayName ? user.displayName : usernameInput,
           authProvider: user.providerData[0].providerId,
           email: user.email,
-          photoURL: user.photoURL
+          photoURL: userPicture ? userPicture : user.photoURL
         }
         await addDoc(usersColRef, userDataDB)
       }
@@ -109,6 +111,19 @@ const getRealTimeUsers = (setAllUsers) => {
       return () => { unsubscribe() };
 }
 
+//Storage
+const storage = getStorage(app);
+
+
+const uploadPicToFireStorage  = async (imageUpload) => {
+  if (imageUpload == null) return;
+  const imageRef = ref(storage, `profile-images/${imageUpload.name + Date.now()}`);
+  const snapshot = await uploadBytes(imageRef, imageUpload);
+  const url =  await getDownloadURL(snapshot.ref);
+  console.log('pic-url', url);
+  return url
+};
+
 
 export {
   auth,
@@ -120,4 +135,5 @@ export {
   getRealTimeAuthChanges,
   getUserWithId,
   getRealTimeUsers,
+  uploadPicToFireStorage
 };

@@ -6,8 +6,7 @@ function ProtectedRoute({ Component, path, isLoggedIn, ...props }) {
     const fromParamURI  = searchParams.get('from');
     const requestedPage = fromParamURI ?  decodeURIComponent(fromParamURI) : null
     const pageToRedirect = (requestedPage !== '/login')? requestedPage : null
-    console.log('pageToRedirect', pageToRedirect, 'requestedPage', requestedPage)
-    console.log('Component.name', Component.name)
+ 
 
     if (path === '/login'|| path === '/signup') {
         return isLoggedIn ? (

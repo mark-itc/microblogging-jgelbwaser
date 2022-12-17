@@ -104,6 +104,8 @@ h1 {
 
 .login-nav {
   margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
 .logout-link {
@@ -127,4 +129,12 @@ h1 {
 
 .mb-1rem {
   margin-bottom: 1rem;
+}
+
+.pic-user {
+  width: 1.7rem;
+  height: 1.7rem;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: .5rem;
 }

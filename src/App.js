@@ -7,15 +7,16 @@ import Login from './pages/Login';
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useUser } from './context/UserContext';
 import ProtectedRoute from './utilities/ProtectedRoute';
+import { AVATAR_PIC_URL } from './constants/constants';
 
 
 
 function App() {
 
+  
 
   const { currentUser, logoutUser } = useUser();
 
-  
   return (
 
     <div className="App">
@@ -25,7 +26,8 @@ function App() {
         <div className='login-nav'>
           {
             currentUser ? <>
-              <span className='nav-greeting'>Hi {currentUser.userName} ! </span>
+              <img src={currentUser.photoURL || AVATAR_PIC_URL} className='pic-user' alt=' user profile '/>
+              <span className='nav-greeting'>Hi {currentUser.userName}  </span>
               <span className='logout-link nav-link' onClick={logoutUser}>Logout</span>
             </> :
             <>
@@ -44,15 +46,6 @@ function App() {
           <Route path='/signup' element={<ProtectedRoute path='/signup' isLoggedIn={!!currentUser} Component={SignUp}/>}/>  
           <Route path='/login' element={<ProtectedRoute  path='/login' isLoggedIn={!!currentUser} Component={Login}/>}/>
           <Route path='*' element={<ProtectedRoute path='/' isLoggedIn={!!currentUser} Component={Main}/>} />
-         
-         
-          {/* <ProtectedRoute path='*' isLoggedIn={currentUser? true : false } element={<Main />}/> */}
-       
-          {/* <ProtectedRoute path='/' isLoggedIn={currentUser? true : false } Component={Main}/>
-          <ProtectedRoute path='/user' isLoggedIn={currentUser? true : false} element={<User  />}/>
-          <ProtectedRoute path='/signup' isLoggedIn={currentUser? true : false}  element={<SignUp  />}/>
-          <ProtectedRoute path='/login' isLoggedIn={currentUser? true : false} element={<Login />}/>
-          <ProtectedRoute path='*' isLoggedIn={currentUser? true : false } element={<Main />}/> */}
         </Routes>
 
       </div>

@@ -54,3 +54,18 @@ opacity: .5;
 .desc {
     margin-top: 1.5rem;
 }
+
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.profile-pic-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}

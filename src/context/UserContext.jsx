@@ -4,9 +4,8 @@ import {
     registerWithEmailAndPassword, logout,
     logInWithEmailAndPassword, 
     signInWithGoogle, getRealTimeAuthChanges,
-    getRealTimeUsers
+    getRealTimeUsers, uploadPicToFireStorage
 } from '../lib/init-firebase';
-
 
 
 const UserContext = createContext({
@@ -23,6 +22,7 @@ export function UserContextProvider({ children }) {
     const [usersMap, setUsersMap] = useState(null);
     const [authError, setAuthError] = useState(null);
     const [localEmail, setLocalEmail] = useState('');
+    const [userPicture, setUserPicture] = useState(null);
 
 
 
@@ -57,8 +57,12 @@ export function UserContextProvider({ children }) {
     }
 
 
-    const signUpUser = async (userName, email, password) => {
+    const signUpUser = async (userName, email, password, picture) => {
         try {
+            if(picture) {
+                 const urlPicture =  await uploadPicToFireStorage(picture);
+                 setUserPicture(urlPicture);
+            }
             setUsernameInput(userName);
             await registerWithEmailAndPassword(userName, email, password);
         } catch (error) {
@@ -80,17 +84,17 @@ export function UserContextProvider({ children }) {
                 if (userDataDB.authProvider !== 'google.com') {
                     await LocalForage.setItem('user-email', userDataDB.email);
                 }
-               // await getUsersFromDB();
             }
 
             const unsubAuth = getRealTimeAuthChanges(
-                onLoginUser, onLogoutUser, usernameInput
+                onLoginUser, onLogoutUser, usernameInput, userPicture
             );
+            
             return () => { unsubAuth() }
         } catch (error) {
             handleError(error)
         }
-    }, [usernameInput])
+    }, [usernameInput, userPicture])
 
 
     useEffect(() => {

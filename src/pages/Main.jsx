@@ -15,12 +15,13 @@ function Main({user}) {
             <CreateTweet />
             <div className='tweet-list'>
 
-                {tweets.map(({ userName, content, date, id }) => {
+                {tweets.map(({ userName, content, date, id, photoURL }) => {
                     return <Tweet
                         key={id}
                         userName={userName}
                         content={content}
-                        date={date} />
+                        date={date}
+                        photoURL={photoURL} />
                 })}
             </div>
         </section>

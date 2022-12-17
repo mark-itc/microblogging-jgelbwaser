@@ -1,0 +1,1 @@
+export const AVATAR_PIC_URL = 'https://firebasestorage.googleapis.com/v0/b/microblogging-caa27.appspot.com/o/avatar.webp?alt=media&token=d6425fca-511b-47d5-8816-5cbab49dfc6a'
