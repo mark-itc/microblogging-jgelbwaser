@@ -27,7 +27,6 @@ function TweetsContextProvider({ children }) {
             setAppError(userError);
             return
         } else {
-            console.log(currentUser)
             return true
         }
     }
@@ -49,6 +48,7 @@ function TweetsContextProvider({ children }) {
         if (!tweetTxtWhiteSpaceClean) return (setIsSaving(false));
         const tweet = {
             content: tweetTxtWhiteSpaceClean,
+
             date: new Date().toISOString(),
             uid: currentUser.uid
         }

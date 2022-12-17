@@ -36,10 +36,8 @@ export const getRealTimeTweets = (updateStateTweets, updateStateError, usersMap)
     try { 
         const unsubscribe = onSnapshot(queryFireStore, snapshot => {
             const dbTweets = snapshot.docs.map(doc => {
-                console.log('doc-data', doc.data())
                 const tweetDataDB = { ...doc.data(), id: doc.id }
                 const tweetWithUserData = addUserData(tweetDataDB, usersMap);
-                console.log(tweetWithUserData)
                 return {...tweetWithUserData}
             })
             updateStateTweets(dbTweets);

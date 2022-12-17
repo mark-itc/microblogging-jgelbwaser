@@ -6,6 +6,7 @@ import SignUp from './pages/SignUp'
 import Login from './pages/Login';
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useUser } from './context/UserContext';
+import ProtectedRoute from './utilities/ProtectedRoute';
 
 
 
@@ -13,8 +14,8 @@ function App() {
 
 
   const { currentUser, logoutUser } = useUser();
-  
 
+  
   return (
 
     <div className="App">
@@ -38,10 +39,20 @@ function App() {
       </nav>
       <div className="container">
         <Routes>
-          <Route path='/' element={<Main />}></Route>
-          <Route path='/user' element={<User  />}></Route>
-          <Route path='/signup' element={<SignUp  />}></Route>
-          <Route path='/login' element={<Login />}></Route>
+          <Route path='/' element={<ProtectedRoute path='/' isLoggedIn={!!currentUser} Component={Main}/>} />
+          <Route path='/user' element={<ProtectedRoute path='/user' isLoggedIn={!!currentUser} Component={User}/>}/>
+          <Route path='/signup' element={<ProtectedRoute path='/signup' isLoggedIn={!!currentUser} Component={SignUp}/>}/>  
+          <Route path='/login' element={<ProtectedRoute  path='/login' isLoggedIn={!!currentUser} Component={Login}/>}/>
+          <Route path='*' element={<ProtectedRoute path='/' isLoggedIn={!!currentUser} Component={Main}/>} />
+         
+         
+          {/* <ProtectedRoute path='*' isLoggedIn={currentUser? true : false } element={<Main />}/> */}
+       
+          {/* <ProtectedRoute path='/' isLoggedIn={currentUser? true : false } Component={Main}/>
+          <ProtectedRoute path='/user' isLoggedIn={currentUser? true : false} element={<User  />}/>
+          <ProtectedRoute path='/signup' isLoggedIn={currentUser? true : false}  element={<SignUp  />}/>
+          <ProtectedRoute path='/login' isLoggedIn={currentUser? true : false} element={<Login />}/>
+          <ProtectedRoute path='*' isLoggedIn={currentUser? true : false } element={<Main />}/> */}
         </Routes>
 
       </div>

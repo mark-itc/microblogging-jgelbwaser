@@ -105,7 +105,6 @@ const getRealTimeUsers = (setAllUsers) => {
             };
           });
           setAllUsers(users);
-          console.log(users);
       });
       return () => { unsubscribe() };
 }

@@ -1,6 +1,5 @@
 import { useState, useContext, createContext, useEffect } from 'react';
 import LocalForage from 'localforage';
-import { useNavigate } from 'react-router-dom';
 import {
     registerWithEmailAndPassword, logout,
     logInWithEmailAndPassword, 
@@ -25,14 +24,13 @@ export function UserContextProvider({ children }) {
     const [authError, setAuthError] = useState(null);
     const [localEmail, setLocalEmail] = useState('');
 
-    const navigate = useNavigate();
+
 
 
     const loginUserWithGoogle = async () => {
         try {
             setAuthError(null);
             await signInWithGoogle();
-            navigate('/');
         } catch (error) {
             handleError(error)
         }
@@ -53,7 +51,6 @@ export function UserContextProvider({ children }) {
         try {
             setAuthError(null);
             await logInWithEmailAndPassword(email, pwd);
-            navigate('/');
         } catch (error) {
             handleError(error)
         }
@@ -64,7 +61,6 @@ export function UserContextProvider({ children }) {
         try {
             setUsernameInput(userName);
             await registerWithEmailAndPassword(userName, email, password);
-            navigate('/');
         } catch (error) {
             handleError(error)
         }
