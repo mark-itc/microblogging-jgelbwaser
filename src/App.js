@@ -21,7 +21,7 @@ function App() {
     <div className="App">
       <nav className='nav-bar'>
         <NavLink className="nav-link" to='/'>Home</NavLink>
-        <NavLink className="nav-link" to='/user'>Profile</NavLink>
+        <NavLink className="nav-link" to='/user'>User Profile</NavLink>
         <div className='login-nav'>
           {
             currentUser ? <>

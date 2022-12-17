@@ -9,7 +9,7 @@ function ProtectedRoute({ Component, path, isLoggedIn, ...props }) {
     console.log('pageToRedirect', pageToRedirect, 'requestedPage', requestedPage)
     console.log('Component.name', Component.name)
 
-    if (Component.name === 'Login'|| Component.name === 'SignUp') {
+    if (path === '/login'|| path === '/signup') {
         return isLoggedIn ? (
             pageToRedirect ? <Navigate to={pageToRedirect} /> : <Navigate to='/' />         
         ) : (
