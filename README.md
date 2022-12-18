@@ -1,8 +1,8 @@
 # Getting Started with Create React App
 
 Project Console: https://console.firebase.google.com/project/microblogging-caa27/overview
-Hosting URL: https://microblogging-caa27.web.app
-
+Hosting URL: 
+https://microblogging-caa27.web.app
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
