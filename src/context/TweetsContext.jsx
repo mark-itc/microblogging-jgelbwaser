@@ -3,7 +3,7 @@
 import { createContext, useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { useUser } from "./UserContext";
-import { addServerTweet, getRealTimeTweets } from "../lib/apiFirebaseDb"
+import { addServerTweet, getRealTimeTweets, getMoreTweetsFromDb } from "../lib/apiFirebaseDb"
 
 
 const ERROR_TWEET_WITHOUT_TEXT = "Please write some text in order to Tweet";
@@ -13,12 +13,14 @@ const TweetsContext = createContext();
 
 function TweetsContextProvider({ children }) {
 
+    const { currentUser, usersMap } = useUser();
+
     const [isSaving, setIsSaving] = useState(false);
     const [appError, setAppError] = useState(null);
     const [tweets, setTweets] = useState([]);
 
 
-    const { currentUser, usersMap } = useUser();
+   
 
 
     const isUserSet = () => {
@@ -64,6 +66,10 @@ function TweetsContextProvider({ children }) {
         setIsSaving(false);
     }
 
+    const  getMoreTweets = async () => {
+         await getMoreTweetsFromDb(setTweets, setAppError)
+    }
+
 
     useEffect(() => {
         let disconnect;
@@ -82,7 +88,7 @@ function TweetsContextProvider({ children }) {
 
     return (
         <TweetsContext.Provider
-            value={{ tweets, addTweet,  appError, isSaving }}
+            value={{ tweets, addTweet,  appError, isSaving, getMoreTweets }}
         >
             {children}
         </TweetsContext.Provider>
