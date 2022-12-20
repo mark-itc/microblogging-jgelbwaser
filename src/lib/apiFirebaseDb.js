@@ -64,7 +64,8 @@ export const getMoreTweetsFromDb = async (updateStateTweets, updateStateError) =
         lastTweetDoc = snapshot.docs[snapshot.docs.length - 1];
         const nextTweets = convertTweetSnapshotToArray(snapshot, dbUsersMap)
         updateStateTweets(prevTweets => {
-            const mergedTweetArray = [...new Set([...prevTweets, ...nextTweets])]
+            const mergedTweetArray = mergeTweetArrays(prevTweets, nextTweets);
+            //const mergedTweetArray = [...new Set([...prevTweets, ...nextTweets])]
             return mergedTweetArray
         })
 
@@ -75,14 +76,29 @@ export const getMoreTweetsFromDb = async (updateStateTweets, updateStateError) =
 
 }
 
+const mergeTweetArrays = (...arraysToMerge) => {
+    const mergedArray = [];
+    const tweetIdsInMergedArray = [];
+    [...arraysToMerge].forEach(arrayToMerge => {
+        arrayToMerge.forEach(tweet =>{
+            if(!tweetIdsInMergedArray.includes(tweet.id)) {
+                tweetIdsInMergedArray.push(tweet.id);
+                mergedArray.push(tweet)
+            };
+        })        
+    })
+    return [...mergedArray]
+}
+
 export const getRealTimeTweets = (updateStateTweets, updateStateError, usersMap) => {
     try {
         dbUsersMap = usersMap;
         const unsubscribe = onSnapshot(queryFireStore, snapshot => {
             lastTweetDocRealTime = snapshot.docs[snapshot.docs.length - 1];
-            const dbTweets = convertTweetSnapshotToArray(snapshot, usersMap)
+            const dbTweets = convertTweetSnapshotToArray(snapshot, usersMap);
             updateStateTweets(prevTweets => {
-                const mergedTweetArray = [...new Set([...dbTweets, ...prevTweets])]
+                const mergedTweetArray = mergeTweetArrays(dbTweets, prevTweets);
+                //const mergedTweetArray = [...new Set([...dbTweets, ...prevTweets])]
                 return mergedTweetArray
             })
         });
