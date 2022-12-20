@@ -55,7 +55,11 @@ function Main({ user }) {
 
                 })}
             </div>
-            {isLoading ? <div>Loading</div> : null}
+            < div className='loading-tweets'>
+            {!tweets.length > 0 ? null : (
+                isLoading ? 'Loading more tweets...': 'No more tweets found')}
+            </div>
+          
 
         </section>
 

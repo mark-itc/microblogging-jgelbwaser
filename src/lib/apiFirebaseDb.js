@@ -58,14 +58,12 @@ export const getMoreTweetsFromDb = async (updateStateTweets, updateStateError) =
     try {     
         const snapshot = await getDocs(queryMoreTweets);
         if(snapshot.empty) {
-            console.log("no more tweets")
             MoreTweetDocsToDownload = false
         }
         lastTweetDoc = snapshot.docs[snapshot.docs.length - 1];
         const nextTweets = convertTweetSnapshotToArray(snapshot, dbUsersMap)
         updateStateTweets(prevTweets => {
             const mergedTweetArray = mergeTweetArrays(prevTweets, nextTweets);
-            //const mergedTweetArray = [...new Set([...prevTweets, ...nextTweets])]
             return mergedTweetArray
         })
 
@@ -97,8 +95,7 @@ export const getRealTimeTweets = (updateStateTweets, updateStateError, usersMap)
             lastTweetDocRealTime = snapshot.docs[snapshot.docs.length - 1];
             const dbTweets = convertTweetSnapshotToArray(snapshot, usersMap);
             updateStateTweets(prevTweets => {
-                const mergedTweetArray = mergeTweetArrays(dbTweets, prevTweets);
-                //const mergedTweetArray = [...new Set([...dbTweets, ...prevTweets])]
+                const mergedTweetArray = mergeTweetArrays(dbTweets, prevTweets); 
                 return mergedTweetArray
             })
         });

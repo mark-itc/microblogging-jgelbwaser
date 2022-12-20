@@ -6,6 +6,12 @@
     margin-top: 2.9rem;
 }
 
+.loading-tweets {
+    text-align: center;
+    margin-top: 1rem;
+    color: var(  --color-txt-date);
+
+}
 
 
 
