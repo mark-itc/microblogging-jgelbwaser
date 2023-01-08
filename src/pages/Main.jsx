@@ -1,38 +1,38 @@
 import './Main.css';
 import CreateTweet from '../components/CreateTweet';
 import Tweet from '../components/Tweet';
-import { useContext, useState, useRef, useCallback } from 'react';
+import { useContext, useRef, useCallback } from 'react';
 import { TweetsContext } from '../context/TweetsContext'
 
 
 
 function Main({ user }) {
 
-    const [isLoading, setIsLoading] = useState(false);
+   // const [waitingForDb, setIsLoading] = useState(false);
 
-    const { tweets, getMoreTweets } = useContext(TweetsContext);
+    const { tweets, getMoreTweets, waitingForDb } = useContext(TweetsContext);
 
     const observer = useRef();
     const lastTweetRef = useCallback(node => {
-        if (isLoading) return
+        if (waitingForDb) return
         if (observer.current) observer.current.disconnect()
         observer.current = new IntersectionObserver( async entries => {
             if (entries[0].isIntersecting) { 
-                await handleGetMoreTweets()
-            
+                await getMoreTweets()
+          
             }
         },{ threshold: 1 })
         if (node) observer.current.observe(node)
-    }, [isLoading] )
+    }, [waitingForDb, getMoreTweets] )
 
 
    
 
-    const handleGetMoreTweets = async () => {
-        setIsLoading(true);
-        await getMoreTweets()
-        setIsLoading(false);
-    }
+    // const handleGetMoreTweets = async () => {
+    //     setIsLoading(true);
+    //     await getMoreTweets()
+    //     setIsLoading(false);
+    // }
 
     return (
         <section className='main-section'>
@@ -57,7 +57,7 @@ function Main({ user }) {
             </div>
             < div className='loading-tweets'>
             {!tweets.length > 0 ? null : (
-                isLoading ? 'Loading more tweets...': 'No more tweets found')}
+                waitingForDb ? 'Loading more tweets...': 'No more tweets found')}
             </div>
           
 

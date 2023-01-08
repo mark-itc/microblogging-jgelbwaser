@@ -3,30 +3,23 @@
 import { createContext, useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { useUser } from "./UserContext";
-import UseFirebaseTweets from "../lib/apiFirebaseDb";
-//import { addServerTweet, getRealTimeTweets, getMoreTweetsFromDb } from "../lib/apiFirebaseDb"
+import { addServerTweet, getRealTimeTweets, getMoreTweetsFromDb } from "../lib/apiFirebaseDb"
 
 
 const ERROR_TWEET_WITHOUT_TEXT = "Please write some text in order to Tweet";
-
-const addUserData = (tweetDataDB, usersMap) => {
-    if (!tweetDataDB.uid) return tweetDataDB
-    const uid = tweetDataDB.uid;
-    const { userName, photoURL } = usersMap[uid] ? usersMap[uid] : { userName: 'user not found', photoURL: null };
-    return { ...tweetDataDB, userName, photoURL }
-}
 
 
 const TweetsContext = createContext();
 
 function TweetsContextProvider({ children }) {
 
-    const { DBTweets, DBErrors, addServerTweet, getMoreTweetsFromDb} = UseFirebaseTweets()
     const { currentUser, usersMap } = useUser();
 
-    const [waitingForDb, setWaitingForDb] = useState(false);
-    const [appError, setAppError] = useState(DBErrors);
-    const [tweets, setTweets] = useState(DBTweets);
+    const [isSaving, setIsSaving] = useState(false);
+    const [appError, setAppError] = useState(null);
+    const [tweets, setTweets] = useState([]);
+
+
 
     const isUserSet = () => {
         if (!currentUser) {      
@@ -49,10 +42,10 @@ function TweetsContextProvider({ children }) {
 
     const addTweet = async (tweetTxt) => {
         setAppError(null);
-        setWaitingForDb(true);
-        if (!isUserSet()) return (setWaitingForDb(false));
+        setIsSaving(true);
+        if (!isUserSet()) return (setIsSaving(false));
         const tweetTxtWhiteSpaceClean = removeTxtExtraWhiteSpace(tweetTxt)
-        if (!tweetTxtWhiteSpaceClean) return (setWaitingForDb(false));
+        if (!tweetTxtWhiteSpaceClean) return (setIsSaving(false));
         const tweet = {
             content: tweetTxtWhiteSpaceClean,
 
@@ -68,35 +61,22 @@ function TweetsContextProvider({ children }) {
             });
             setTweets(newTweetArray);
         }
-        setWaitingForDb(false);
+        setIsSaving(false);
     }
 
     const  getMoreTweets = async () => {
-        setWaitingForDb(true);
-        await getMoreTweetsFromDb()
-        setWaitingForDb(false);
-
+         await getMoreTweetsFromDb(setTweets, setAppError)
     }
 
 
-
-
-    useEffect(()=>{
-        if(!usersMap) return
-        const tweetsWithUserData = DBTweets.map(tweet => addUserData(tweet, usersMap));
-        setTweets(tweetsWithUserData)
-        },[DBTweets,usersMap])
-
-
-
-    // useEffect(() => {
-    //     let disconnect;
-    //     if(!currentUser || !usersMap) return
-    //         disconnect = getRealTimeTweets(setTweets, setAppError, usersMap); 
-    //     return (
-    //         () => { disconnect() }
-    //     )
-    // }, [usersMap, currentUser]);
+    useEffect(() => {
+        let disconnect;
+        if(!currentUser || !usersMap) return
+            disconnect = getRealTimeTweets(setTweets, setAppError, usersMap); 
+        return (
+            () => { disconnect() }
+        )
+    }, [usersMap, currentUser]);
 
 
     useEffect(() => {
@@ -104,11 +84,9 @@ function TweetsContextProvider({ children }) {
     }, [currentUser])
 
 
-   
-
     return (
         <TweetsContext.Provider
-            value={{ tweets, addTweet,  appError, waitingForDb, getMoreTweets }}
+            value={{ tweets, addTweet,  appError, isSaving, getMoreTweets }}
         >
             {children}
         </TweetsContext.Provider>
