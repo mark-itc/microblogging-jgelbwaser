@@ -1,10 +1,14 @@
 .tweet-container {
     padding: 1.25rem;
     background: var(--color-bg-element);
-border-radius: 6px;
-margin-bottom: 1rem;
-font-size: .875rem;
-line-height: 1.2;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: .875rem;
+    line-height: 1.2;
+}
+
+.filter-applied .tweet-user-details {
+    color:  var(--color-blue-light);
 }
 
 .tweet-header {

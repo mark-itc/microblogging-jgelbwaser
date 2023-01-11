@@ -21,12 +21,15 @@ const TweetsContext = createContext();
 
 function TweetsContextProvider({ children }) {
 
-    const { DBTweets, DBErrors, addServerTweet, getMoreTweetsFromDb} = UseFirebaseTweets()
     const { currentUser, usersMap } = useUser();
+    const { DBTweets, DBErrors, addServerTweet, getMoreTweetsFromDb, updateQueryArgs} = UseFirebaseTweets(currentUser)
+ 
 
-    const [waitingForDb, setWaitingForDb] = useState(false);
+    const [waitingForDb, setWaitingForDb] = useState(true);
     const [appError, setAppError] = useState(DBErrors);
     const [tweets, setTweets] = useState(DBTweets);
+    const [isFilterApplied, setIsFilterApplied] = useState(false);
+
 
     const isUserSet = () => {
         if (!currentUser) {      
@@ -75,40 +78,38 @@ function TweetsContextProvider({ children }) {
         setWaitingForDb(true);
         await getMoreTweetsFromDb()
         setWaitingForDb(false);
-
     }
 
+    const filterTweets = ({myTweets}) => {
+        let conditions ={};
+        if(myTweets) {
+            setIsFilterApplied(true);
+            conditions = {users: currentUser.uid}
+        } else {
+            setIsFilterApplied(false);
+        }
+        setWaitingForDb(true);
+        updateQueryArgs(conditions)
+    }
 
-
+  
+    useEffect(()=>{
+        setWaitingForDb(true);
+    },[currentUser])
 
     useEffect(()=>{
         if(!usersMap) return
         const tweetsWithUserData = DBTweets.map(tweet => addUserData(tweet, usersMap));
-        setTweets(tweetsWithUserData)
-        },[DBTweets,usersMap])
+        setTweets(tweetsWithUserData);
+        setWaitingForDb(false);
+        },[DBTweets,usersMap]);
 
 
 
-    // useEffect(() => {
-    //     let disconnect;
-    //     if(!currentUser || !usersMap) return
-    //         disconnect = getRealTimeTweets(setTweets, setAppError, usersMap); 
-    //     return (
-    //         () => { disconnect() }
-    //     )
-    // }, [usersMap, currentUser]);
-
-
-    useEffect(() => {
-        currentUser && setAppError('');
-    }, [currentUser])
-
-
-   
 
     return (
         <TweetsContext.Provider
-            value={{ tweets, addTweet,  appError, waitingForDb, getMoreTweets }}
+            value={{ tweets, isFilterApplied, addTweet,  appError, waitingForDb, setWaitingForDb, getMoreTweets, filterTweets }}
         >
             {children}
         </TweetsContext.Provider>

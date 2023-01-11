@@ -14,5 +14,21 @@
 
 }
 
+.tweet-filters-container {
+    margin: 1rem 0;
+    display: flex;
+    justify-content:  space-around;
+}
+
+.tweet-filter-option {
+    color: white !important;
+}
+
+.tweet-filter-option.Mui-selected{
+    color: #5498db !important;
+}  
+    
+
+
 
 

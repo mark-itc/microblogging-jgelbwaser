@@ -11,7 +11,7 @@ const Tweet = React.forwardRef(({ content, userName, date, photoURL },ref) => {
         <div className='tweet-container'  ref={ref}>
             <div className='tweet-header flex-space-between'>
                 <div className='tweet-user-details'>
-                    <img src={photoURL || AVATAR_PIC_URL} className='pic-user' alt=' user profile ' />
+                    <img referrerPolicy="no-referrer" src={photoURL || AVATAR_PIC_URL} className='pic-user' alt=' user profile ' />
                     <span>{userName}</span>
                 </div>
                 <span>{date}</span>

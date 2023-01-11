@@ -1,43 +1,46 @@
 import {
     collection, addDoc,
-    onSnapshot, query, orderBy, serverTimestamp, limit, startAfter, getDocs
+    onSnapshot, query, orderBy, serverTimestamp, limit, startAfter, getDocs, where
 } from "firebase/firestore";
 import { db } from "./init-firebase";
 import { useState, useRef, useEffect } from 'react';
 
 const ERROR_TWEET_ID_MISSING = "id missing in server response, can't confirmed  tweet was saved"
-const TweetsLimitPerRequest = 10;
+const TWEETS_LIMIT_PER_REQUEST = 10;
 const tweetsColRef = collection(db, 'tweets');
-
-
-//NOT in USU
-// const queryFireStore = query(tweetsColRef, orderBy('timestamp', 'desc'), limit(TweetsLimitPerRequest));
-// let dbUsersMap = {}
-// let lastTweetDocRealTime = null;
-// let lastTweetDoc = null
-// let MoreTweetDocsToDownload = true;
+const initialQueryArgs = [tweetsColRef, orderBy('timestamp', 'desc'), limit(TWEETS_LIMIT_PER_REQUEST)];
 
 
 
 
-export default function UseFirebaseTweets() {
-
+export default function UseFirebaseTweets(currentUser) {
+    
     const [DBTweets, setDBTweets] = useState([]);
     const [DBError, setDBError] = useState(null);
-    const [tweetQueryArgs, setTweetQueryArgs] = useState(
-        [tweetsColRef, orderBy('timestamp', 'desc'), limit(TweetsLimitPerRequest)]
-    )
+    const [tweetQueryArgs, setTweetQueryArgs] = useState(initialQueryArgs)
     const lastTweet = useRef();
     let MoreTweetDocsToDownload = useRef(true);
 
 
+    const updateQueryArgs = ({ users, searchTermContent }) => {
+        const newQuery = [tweetsColRef, orderBy('timestamp', 'desc')];
+        if (users) {
+            const whereClause = where('uid', Array.isArray(users) ? 'in' : '==', users);
+            newQuery.push(whereClause);
+        }
+        newQuery.push(limit(searchTermContent? 0 : TWEETS_LIMIT_PER_REQUEST));
+        setTweetQueryArgs(newQuery);
+    }
 
+    const restoreQueryArgs = () =>  setTweetQueryArgs(initialQueryArgs)
 
 
 
     const getMoreTweetsFromDb = async () => {
 
-         if (!MoreTweetDocsToDownload.current) return
+        if (!MoreTweetDocsToDownload.current) return
+
+        const usedQueryArgs = tweetQueryArgs;
 
         const queryMoreTweets = query(
             ...tweetQueryArgs,
@@ -51,6 +54,8 @@ export default function UseFirebaseTweets() {
             }
             lastTweet.current = snapshot.docs[snapshot.docs.length - 1];
             const nextTweets = convertTweetSnapshotToArray(snapshot)
+
+            if (usedQueryArgs !== tweetQueryArgs) return
             setDBTweets(prevTweets => {
                 const mergedTweetArray = mergeTweetArrays(prevTweets, nextTweets);
                 return mergedTweetArray
@@ -99,10 +104,10 @@ export default function UseFirebaseTweets() {
         }
     }
 
-
-
     useEffect(() => {
+        if(!currentUser) return
         try {
+            MoreTweetDocsToDownload.current = true
             const unsubscribe = onSnapshot(query(...tweetQueryArgs), snapshot => {
                 if (!lastTweet.current) {
                     lastTweet.current = snapshot.docs[snapshot.docs.length - 1];
@@ -112,77 +117,35 @@ export default function UseFirebaseTweets() {
                     const mergedTweetArray = mergeTweetArrays(newDBTweets, prevTweets);
                     return mergedTweetArray
                 })
-                
+
 
             });
-            return () => { unsubscribe() };
+            return () => { 
+                lastTweet.current = null;
+                setDBTweets([]);
+                unsubscribe() };
 
         } catch (error) {
             console.log(error);
             setDBError(error.message)
         }
 
-    }, [tweetQueryArgs])
+    }, [tweetQueryArgs, currentUser]);
 
-
+    useEffect(()=>{
+        if(!currentUser) return
+        setTweetQueryArgs(initialQueryArgs)},[currentUser])
 
     return (
-        { DBTweets, DBError, addServerTweet, getMoreTweetsFromDb }
+        { DBTweets, DBError, addServerTweet, getMoreTweetsFromDb, updateQueryArgs, restoreQueryArgs }
     )
 }
 
 
 
-// const getRealTimeTweetsORG = () => {
-//     try {
-//         const unsubscribe = onSnapshot(query(tweetQueryArgs), snapshot => {
-//             if (!lastTweet.current) {
-//                 lastTweet.current = snapshot.docs[snapshot.docs.length - 1];
-//             }
-//             const newDBTweets = convertTweetSnapshotToArray(snapshot);
-//             setDBTweets(prevTweets => {
-//                 const mergedTweetArray = mergeTweetArrays(newDBTweets, prevTweets);
-//                 return mergedTweetArray
-//             })
-//         });
-//         return () => { unsubscribe() };
-
-//     } catch (error) {
-//         console.log(error);
-//         setDBError(error.message)
-//     }
-// }
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-// export const getRealTimeTweets = (updateStateTweets, updateStateError, usersMap) => {
-//     try {
-//         dbUsersMap = usersMap;
-//         const unsubscribe = onSnapshot(queryFireStore, snapshot => {
-//             lastTweetDocRealTime = snapshot.docs[snapshot.docs.length - 1];
-//             const dbTweets = convertTweetSnapshotToArray(snapshot, usersMap);
-//             updateStateTweets(prevTweets => {
-//                 const mergedTweetArray = mergeTweetArrays(dbTweets, prevTweets);
-//                 return mergedTweetArray
-//             })
-//         });
-//         return () => { unsubscribe() };
-
-//     } catch (error) {
-//         console.log(error);
-//         updateStateError(error.message)
-//     }
-// }

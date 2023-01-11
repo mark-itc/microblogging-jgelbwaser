@@ -26,7 +26,7 @@ function App() {
         <div className='login-nav'>
           {
             currentUser ? <>
-              <img src={currentUser.photoURL || AVATAR_PIC_URL} className='pic-user' alt=' user profile '/>
+              <img referrerPolicy="no-referrer" src={currentUser.photoURL || AVATAR_PIC_URL} className='pic-user' alt=' user profile '/>
               <span className='nav-greeting'>Hi {currentUser.userName}  </span>
               <span className='logout-link nav-link' onClick={logoutUser}>Logout</span>
             </> :
