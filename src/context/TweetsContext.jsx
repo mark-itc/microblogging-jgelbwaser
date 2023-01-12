@@ -14,6 +14,7 @@ const addUserData = (tweetDataDB, usersMap) => {
     const uid = tweetDataDB.uid;
     const { userName, photoURL } = usersMap[uid] ? usersMap[uid] : { userName: 'user not found', photoURL: null };
     return { ...tweetDataDB, userName, photoURL }
+
 }
 
 
@@ -31,20 +32,30 @@ function TweetsContextProvider({ children }) {
     const [tweets, setTweets] = useState(DBTweets);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [tabIndex, setTabIndex] = useState(0);
+    const [searchResultsDesc, setSearchResultsDesc] = useState('')
     const usersFilter = useRef(null);
     const isPaginationOn = useRef(true) 
 
+    useEffect(() => {
+        isPaginationOn.current = true;
+        usersFilter.current = null;
+        setSearchResultsDesc('');
+        setSearchTerm('');
+        setTabIndex(0);
+
+    },[currentUser])
 
     const searchInUsers = (term) => {
+        setTabIndex(0);
         isPaginationOn.current =true
-        //console.log(usersMap)
         const UidsFound = Object.keys(usersMap).filter((uid)=>{
             return usersMap[uid].userName.includes(term)
         })
         if(!UidsFound) return setTweets([])
         usersFilter.current = UidsFound
         updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
-
+        setSearchResultsDesc(`Results search '${term}' in users:`)
     }
     
     const searchInTweets = (term) => {
@@ -53,6 +64,7 @@ function TweetsContextProvider({ children }) {
         isPaginationOn.current =false
         updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
         setSearchTerm(term);
+        setSearchResultsDesc(`Results search '${term}' in tweets:`)
     }
 
     // useEffect(()=>{
@@ -79,6 +91,8 @@ function TweetsContextProvider({ children }) {
     }
 
     const addTweet = async (tweetTxt) => {
+        setSearchResultsDesc('')
+        setSearchTerm('');
         setAppError(null);
         setWaitingForDb(true);
         if (!isUserSet()) return (setWaitingForDb(false));
@@ -111,7 +125,7 @@ function TweetsContextProvider({ children }) {
    
 
     const filterTweets = ({myTweets}) => {
-
+        setSearchResultsDesc('')
         setSearchTerm('');
         if(myTweets) {
             setIsFilterApplied(true);
@@ -151,6 +165,9 @@ function TweetsContextProvider({ children }) {
             addTweet,  
             appError, 
             waitingForDb,
+            tabIndex, 
+            searchResultsDesc,
+            setTabIndex,
              setWaitingForDb, 
              getMoreTweets, 
              searchInUsers,

@@ -124,7 +124,7 @@ h1 {
   background: #F8D7DA;
   border: 1px solid #F5C6CB;
   border-radius: 4px;
-  color:#721C24
+  color: #721C24
 }
 
 .mb-1rem {
@@ -141,4 +141,13 @@ h1 {
 
 .search-form {
   margin-right: 1rem;
+}
+
+
+@media screen and (max-width: 700px) {
+
+  .search-form {
+    display: none;
+
+  }
 }

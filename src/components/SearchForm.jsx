@@ -33,6 +33,7 @@ export default function SearchForm() {
     } else{
     searchInUsers(inputRef.current.value)
   }
+  inputRef.current.value ='';
   }; 
 
   const handleMenuItemClick = (event, index) => {

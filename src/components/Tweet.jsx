@@ -14,7 +14,7 @@ const Tweet = React.forwardRef(({ content, userName, date, photoURL },ref) => {
                     <img referrerPolicy="no-referrer" src={photoURL || AVATAR_PIC_URL} className='pic-user' alt=' user profile ' />
                     <span>{userName}</span>
                 </div>
-                <span>{date}</span>
+                <span>{new Date(date).toLocaleString()}</span>
             </div>
             <div className='tweet-text'>
                 {contentWithoutExtraSpace}

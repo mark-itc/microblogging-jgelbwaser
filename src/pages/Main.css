@@ -9,7 +9,7 @@
 .loading-tweets {
     text-align: center;
     margin-top: 1rem;
-    color: var(  --color-txt-date);
+    color: var(--color-txt-date);
     margin-bottom: 3rem;
 
 }
@@ -17,18 +17,18 @@
 .tweet-filters-container {
     margin: 1rem 0;
     display: flex;
-    justify-content:  space-around;
+    justify-content: space-around;
 }
 
 .tweet-filter-option {
     color: white !important;
 }
 
-.tweet-filter-option.Mui-selected{
+.tweet-filter-option.Mui-selected {
     color: #5498db !important;
-}  
-    
+}
 
-
-
-
+.search-results-desc {
+    color: var(--color-txt-date);
+    text-align: center;
+}

@@ -22,14 +22,18 @@ function App() {
 
     <div className="App">
       <nav className='nav-bar'>
+      
+      {currentUser && <>
         <NavLink className="nav-link" to='/'>Home</NavLink>
         <NavLink className="nav-link" to='/user'>User Profile</NavLink>
+        </> }
+
+      
         <div className='login-nav'>
           {
             currentUser ? <>
               <SearchForm />
               <img referrerPolicy="no-referrer" src={currentUser.photoURL || AVATAR_PIC_URL} className='pic-user' alt=' user profile '/>
-              <span className='nav-greeting'>Hi {currentUser.userName}  </span>
               <span className='logout-link nav-link' onClick={logoutUser}>Logout</span>
             </> :
             <>

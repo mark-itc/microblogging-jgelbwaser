@@ -1,12 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { TweetsContext } from '../context/TweetsContext';
 
 import { Tabs, Tab } from '@mui/material';
 
 export default function FilterTweets() {
 
-    const [tabIndex, setTabIndex] = useState(0);
-    const { filterTweets } = useContext(TweetsContext);
+ 
+    const { filterTweets, tabIndex, setTabIndex} = useContext(TweetsContext);
 
     const handleTabChange = (event, newValue) => {
         filterTweets({ myTweets: !tabIndex })
