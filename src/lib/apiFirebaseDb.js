@@ -22,13 +22,14 @@ export default function UseFirebaseTweets(currentUser) {
     let MoreTweetDocsToDownload = useRef(true);
 
 
-    const updateQueryArgs = ({ users, searchTermContent }) => {
+    const updateQueryArgs = ({ users, isPaginationOn }) => {
         const newQuery = [tweetsColRef, orderBy('timestamp', 'desc')];
         if (users) {
             const whereClause = where('uid', Array.isArray(users) ? 'in' : '==', users);
             newQuery.push(whereClause);
         }
-        newQuery.push(limit(searchTermContent? 0 : TWEETS_LIMIT_PER_REQUEST));
+        isPaginationOn && newQuery.push(limit(TWEETS_LIMIT_PER_REQUEST ));
+        console.log(newQuery);
         setTweetQueryArgs(newQuery);
     }
 

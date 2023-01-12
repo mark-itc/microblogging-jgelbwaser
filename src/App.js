@@ -8,6 +8,7 @@ import { Routes, Route, NavLink } from 'react-router-dom';
 import { useUser } from './context/UserContext';
 import ProtectedRoute from './utilities/ProtectedRoute';
 import { AVATAR_PIC_URL } from './constants/constants';
+import SearchForm from './components/SearchForm';
 
 
 
@@ -26,6 +27,7 @@ function App() {
         <div className='login-nav'>
           {
             currentUser ? <>
+              <SearchForm />
               <img referrerPolicy="no-referrer" src={currentUser.photoURL || AVATAR_PIC_URL} className='pic-user' alt=' user profile '/>
               <span className='nav-greeting'>Hi {currentUser.userName}  </span>
               <span className='logout-link nav-link' onClick={logoutUser}>Logout</span>

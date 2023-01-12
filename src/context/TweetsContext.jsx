@@ -1,6 +1,6 @@
 
 
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useRef } from "react";
 import { Link } from 'react-router-dom';
 import { useUser } from "./UserContext";
 import UseFirebaseTweets from "../lib/apiFirebaseDb";
@@ -17,6 +17,7 @@ const addUserData = (tweetDataDB, usersMap) => {
 }
 
 
+
 const TweetsContext = createContext();
 
 function TweetsContextProvider({ children }) {
@@ -29,7 +30,34 @@ function TweetsContextProvider({ children }) {
     const [appError, setAppError] = useState(DBErrors);
     const [tweets, setTweets] = useState(DBTweets);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const usersFilter = useRef(null);
+    const isPaginationOn = useRef(true) 
 
+
+    const searchInUsers = (term) => {
+        isPaginationOn.current =true
+        //console.log(usersMap)
+        const UidsFound = Object.keys(usersMap).filter((uid)=>{
+            return usersMap[uid].userName.includes(term)
+        })
+        if(!UidsFound) return setTweets([])
+        usersFilter.current = UidsFound
+        updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
+
+    }
+    
+    const searchInTweets = (term) => {
+        console.log('searchInTweets', term);
+        setSearchTerm('');
+        isPaginationOn.current =false
+        updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
+        setSearchTerm(term);
+    }
+
+    // useEffect(()=>{
+    //     updateQueryArgs({users: UsersFilterArray, isPaginationOn:isPaginationOn})
+    // },[UsersFilterArray,isPaginationOn])
 
     const isUserSet = () => {
         if (!currentUser) {      
@@ -80,16 +108,23 @@ function TweetsContextProvider({ children }) {
         setWaitingForDb(false);
     }
 
+   
+
     const filterTweets = ({myTweets}) => {
-        let conditions ={};
+
+        setSearchTerm('');
         if(myTweets) {
             setIsFilterApplied(true);
-            conditions = {users: currentUser.uid}
+            usersFilter.current =currentUser.uid
         } else {
+            usersFilter.current = null
             setIsFilterApplied(false);
         }
         setWaitingForDb(true);
-        updateQueryArgs(conditions)
+        console.log('myTweets',myTweets)
+        console.log('usersFilter',usersFilter)
+        updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
+    
     }
 
   
@@ -99,18 +134,32 @@ function TweetsContextProvider({ children }) {
 
     useEffect(()=>{
         if(!usersMap) return
-        const tweetsWithUserData = DBTweets.map(tweet => addUserData(tweet, usersMap));
+ 
+        const tweetArray = searchTerm ? 
+            DBTweets.filter(tweet=> tweet.content.includes(searchTerm))
+            :
+            [...DBTweets] 
+
+        const tweetsWithUserData = tweetArray.map(tweet => addUserData(tweet, usersMap));
         setTweets(tweetsWithUserData);
         setWaitingForDb(false);
-        },[DBTweets,usersMap]);
+        },[DBTweets,usersMap,searchTerm]);
 
-
+        const value = {
+            tweets, 
+            isFilterApplied, 
+            addTweet,  
+            appError, 
+            waitingForDb,
+             setWaitingForDb, 
+             getMoreTweets, 
+             searchInUsers,
+             searchInTweets,
+             filterTweets }
 
 
     return (
-        <TweetsContext.Provider
-            value={{ tweets, isFilterApplied, addTweet,  appError, waitingForDb, setWaitingForDb, getMoreTweets, filterTweets }}
-        >
+        <TweetsContext.Provider  value={value}  >
             {children}
         </TweetsContext.Provider>
 
