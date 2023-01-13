@@ -4,6 +4,8 @@ import {
 } from "firebase/firestore";
 import { db } from "./init-firebase";
 import { useState, useRef, useEffect } from 'react';
+import { useLocation, useParams } from 'react-router-dom'
+
 
 const ERROR_TWEET_ID_MISSING = "id missing in server response, can't confirmed  tweet was saved"
 const TWEETS_LIMIT_PER_REQUEST = 10;
@@ -13,13 +15,18 @@ const initialQueryArgs = [tweetsColRef, orderBy('timestamp', 'desc'), limit(TWEE
 
 
 
-export default function UseFirebaseTweets(currentUser) {
-    
+
+export default function UseFirebaseTweets(currentUser, usersFilter) {
+
     const [DBTweets, setDBTweets] = useState([]);
     const [DBError, setDBError] = useState(null);
     const [tweetQueryArgs, setTweetQueryArgs] = useState(initialQueryArgs)
     const lastTweet = useRef();
     let MoreTweetDocsToDownload = useRef(true);
+    const routeLocation = useLocation();
+    const { profileUid } = useParams()
+
+  
 
 
     const updateQueryArgs = ({ users, isPaginationOn }) => {
@@ -28,12 +35,12 @@ export default function UseFirebaseTweets(currentUser) {
             const whereClause = where('uid', Array.isArray(users) ? 'in' : '==', users);
             newQuery.push(whereClause);
         }
-        isPaginationOn && newQuery.push(limit(TWEETS_LIMIT_PER_REQUEST ));
+        isPaginationOn && newQuery.push(limit(TWEETS_LIMIT_PER_REQUEST));
         console.log(newQuery);
         setTweetQueryArgs(newQuery);
     }
 
-    const restoreQueryArgs = () =>  setTweetQueryArgs(initialQueryArgs)
+    const restoreQueryArgs = () => setTweetQueryArgs(initialQueryArgs)
 
 
 
@@ -106,7 +113,7 @@ export default function UseFirebaseTweets(currentUser) {
     }
 
     useEffect(() => {
-        if(!currentUser) return
+        if (!currentUser) return
         try {
             MoreTweetDocsToDownload.current = true
             const unsubscribe = onSnapshot(query(...tweetQueryArgs), snapshot => {
@@ -121,10 +128,11 @@ export default function UseFirebaseTweets(currentUser) {
 
 
             });
-            return () => { 
+            return () => {
                 lastTweet.current = null;
                 setDBTweets([]);
-                unsubscribe() };
+                unsubscribe()
+            };
 
         } catch (error) {
             console.log(error);
@@ -133,9 +141,19 @@ export default function UseFirebaseTweets(currentUser) {
 
     }, [tweetQueryArgs, currentUser]);
 
-    useEffect(()=>{
-        if(!currentUser) return
-        setTweetQueryArgs(initialQueryArgs)},[currentUser])
+
+    useEffect(() => {
+        if (!currentUser) return
+        const inUserPage = routeLocation.pathname.includes('/user')
+        console.log(inUserPage);
+        if (!inUserPage) {
+            updateQueryArgs({ users: null, isPaginationOn: true })
+            return
+        }
+        const profileUser = profileUid || currentUser.uid
+        updateQueryArgs({ users: profileUser, isPaginationOn: true })
+    }, [routeLocation, profileUid, currentUser]);
+
 
     return (
         { DBTweets, DBError, addServerTweet, getMoreTweetsFromDb, updateQueryArgs, restoreQueryArgs }

@@ -1,52 +1,40 @@
 
-import { useState, useEffect } from 'react';
+
 import './User.css';
 import { useUser } from '../context/UserContext';
+import { AVATAR_PIC_URL } from '../constants/constants.js';
+import TweetList from '../components/TweetList';
+//import {TweetsContext} from '../context/TweetsContext'
 
 
 function User() {
 
-    const { user, loginUser } =useUser;
+    const { currentUser } = useUser();
+   // const {searchInUsers} =useContext(TweetsContext)
+ 
 
-    const [userInput, setUserInput] = useState(user);
+    //photoURL
+    //userName
+    //email
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        loginUser(userInput);
-    }
-
-    useEffect(() => {
-        setUserInput(user);
-    },
-        [user])
+ //   searchInUsers(currentUser.currentUser.uid)
 
 
     return (
         <section className="section">
-            <h1>Profile</h1>
-            <form
-                className='form'
-                onSubmit={(e) => { handleSubmit(e) }}
-            >
-                <div className='form-group'>
-                    <label
-                        className='form-label'
-                        htmlFor="username-input">User Name
-                    </label>
-                    <input
-                        value={userInput}
-                        onChange={(e) => { setUserInput(e.target.value.trim()) }}
-                        className='form-input'
-                        id='username-input'
-                        placeholder="Enter a username"
-                        type='text'></input>
-                </div>
-                <button
-                    disabled={userInput ? false : true}
-                    className='submit-btn form-button'
-                    type='submit'
-                >Log in</button>
-            </form>
+            <div className='user-info'>
+                <img className='profile-pic'
+                    src={currentUser.photoURL || AVATAR_PIC_URL}
+                    alt="profile-pic"
+                />
+                <h1>{currentUser.userName}</h1>
+                <h3>{currentUser.email}</h3>
+                <button className='submit-btn'>Edit</button>
+            </div>
+            <div className='hr-with-txt-line'>
+                <span className="hr-with-txt-content">USER TWEETS</span>
+            </div>
+            <TweetList />
         </section>
 
     )

@@ -1,10 +1,10 @@
 
 
 import { createContext, useState, useEffect, useRef } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate,  useLocation, useParams } from 'react-router-dom';
 import { useUser } from "./UserContext";
 import UseFirebaseTweets from "../lib/apiFirebaseDb";
-//import { addServerTweet, getRealTimeTweets, getMoreTweetsFromDb } from "../lib/apiFirebaseDb"
+import { } from 'react-router-dom'
 
 
 const ERROR_TWEET_WITHOUT_TEXT = "Please write some text in order to Tweet";
@@ -25,8 +25,6 @@ function TweetsContextProvider({ children }) {
 
     const { currentUser, usersMap } = useUser();
     const { DBTweets, DBErrors, addServerTweet, getMoreTweetsFromDb, updateQueryArgs} = UseFirebaseTweets(currentUser)
- 
-
     const [waitingForDb, setWaitingForDb] = useState(true);
     const [appError, setAppError] = useState(DBErrors);
     const [tweets, setTweets] = useState(DBTweets);
@@ -35,20 +33,31 @@ function TweetsContextProvider({ children }) {
     const [tabIndex, setTabIndex] = useState(0);
     const [searchResultsDesc, setSearchResultsDesc] = useState('')
     const usersFilter = useRef(null);
-    const isPaginationOn = useRef(true) 
+    const isPaginationOn = useRef(true);
+    const routeLocation = useLocation();
+    const { profileUid } = useParams()
+    const navigate = useNavigate();
+    const inUserPage = routeLocation.pathname.includes('/user')
 
+    
     useEffect(() => {
+resetQuery()
+    },[currentUser, routeLocation])
+
+
+    const resetQuery = () => {
         isPaginationOn.current = true;
         usersFilter.current = null;
         setSearchResultsDesc('');
         setSearchTerm('');
         setTabIndex(0);
-
-    },[currentUser])
+    }
 
     const searchInUsers = (term) => {
         setTabIndex(0);
+        setSearchTerm('');
         isPaginationOn.current =true
+        inUserPage && navigate('/');
         const UidsFound = Object.keys(usersMap).filter((uid)=>{
             return usersMap[uid].userName.includes(term)
         })
@@ -62,14 +71,15 @@ function TweetsContextProvider({ children }) {
         console.log('searchInTweets', term);
         setSearchTerm('');
         isPaginationOn.current =false
+        if (inUserPage) {
+            usersFilter.current = profileUid || currentUser.uid
+        }
         updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
         setSearchTerm(term);
         setSearchResultsDesc(`Results search '${term}' in tweets:`)
     }
 
-    // useEffect(()=>{
-    //     updateQueryArgs({users: UsersFilterArray, isPaginationOn:isPaginationOn})
-    // },[UsersFilterArray,isPaginationOn])
+
 
     const isUserSet = () => {
         if (!currentUser) {      
@@ -135,8 +145,6 @@ function TweetsContextProvider({ children }) {
             setIsFilterApplied(false);
         }
         setWaitingForDb(true);
-        console.log('myTweets',myTweets)
-        console.log('usersFilter',usersFilter)
         updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
     
     }

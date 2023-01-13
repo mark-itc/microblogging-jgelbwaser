@@ -1,17 +1,7 @@
-.tweet-list {
-    margin-top: 1.25rem;
-}
+
 
 .main-section {
     margin-top: 2.9rem;
-}
-
-.loading-tweets {
-    text-align: center;
-    margin-top: 1rem;
-    color: var(--color-txt-date);
-    margin-bottom: 3rem;
-
 }
 
 .tweet-filters-container {
@@ -30,5 +20,5 @@
 
 .search-results-desc {
     color: var(--color-txt-date);
-    text-align: center;
+   
 }
