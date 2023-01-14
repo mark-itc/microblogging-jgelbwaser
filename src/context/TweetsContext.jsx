@@ -14,7 +14,6 @@ const addUserData = (tweetDataDB, usersMap) => {
     const uid = tweetDataDB.uid;
     const { userName, photoURL } = usersMap[uid] ? usersMap[uid] : { userName: 'user not found', photoURL: null };
     return { ...tweetDataDB, userName, photoURL }
-
 }
 
 
@@ -23,8 +22,9 @@ const TweetsContext = createContext();
 function TweetsContextProvider({ children }) {
 
     const { currentUser, usersMap } = useUser();
+    const usersFilter = useRef(null);
     const [profilePageUserId, setProfilePAgeUserId] = useState(null)
-    const { DBTweets, DBErrors, addServerTweet, getMoreTweetsFromDb, updateQueryArgs } = UseFirebaseTweets(currentUser, profilePageUserId)
+    const { DBTweets, DBErrors, addServerTweet, getMoreTweetsFromDb, updateQueryArgs } = UseFirebaseTweets(currentUser, usersFilter, profilePageUserId)
     const [waitingForDb, setWaitingForDb] = useState(true);
     const [appError, setAppError] = useState(DBErrors);
     const [tweets, setTweets] = useState(DBTweets);
@@ -32,7 +32,6 @@ function TweetsContextProvider({ children }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [tabIndex, setTabIndex] = useState(0);
     const [searchResultsDesc, setSearchResultsDesc] = useState('')
-    const usersFilter = useRef(null);
     const isPaginationOn = useRef(true);
     const routeLocation = useLocation();
     const navigate = useNavigate();
@@ -45,6 +44,7 @@ function TweetsContextProvider({ children }) {
             const params = routeLocation.pathname.split('/')
             const urlUserId = params[params.indexOf('user') + 1]
             setProfilePAgeUserId(urlUserId || currentUser?.uid )
+            usersFilter.current = urlUserId || currentUser?.uid
         } else {
             setProfilePAgeUserId(null)
         }
@@ -75,7 +75,6 @@ function TweetsContextProvider({ children }) {
     }
 
     const searchInTweets = (term) => {
-        console.log('searchInTweets', term);
         setSearchTerm('');
         if(profilePageUserId) {
             usersFilter.current = profilePageUserId
@@ -85,8 +84,6 @@ function TweetsContextProvider({ children }) {
         setSearchTerm(term);
         setSearchResultsDesc(`Results search '${term}' in tweets:`)
     }
-
-
 
     const isUserSet = () => {
         if (!currentUser) {
@@ -161,6 +158,8 @@ function TweetsContextProvider({ children }) {
     useEffect(() => {
         setWaitingForDb(true);
     }, [currentUser])
+
+ 
 
     useEffect(() => {
         if (!usersMap) return
