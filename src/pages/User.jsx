@@ -9,8 +9,7 @@ import { TweetsContext } from '../context/TweetsContext';
 function User() {
     const {  currentUser, usersMap } = useUser();
     const {profilePageUserId} = useContext(TweetsContext);
-    const pageUser =  profilePageUserId? usersMap[profilePageUserId] : currentUser;
-
+    const pageUser =  profilePageUserId && usersMap? usersMap[profilePageUserId] : currentUser;
     return (
         <section className="section">
             <div className='user-info'>
