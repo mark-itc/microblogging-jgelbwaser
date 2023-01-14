@@ -4,45 +4,33 @@ import {
 } from "firebase/firestore";
 import { db } from "./init-firebase";
 import { useState, useRef, useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom'
-
+import { useLocation} from 'react-router-dom'
 
 const ERROR_TWEET_ID_MISSING = "id missing in server response, can't confirmed  tweet was saved"
 const TWEETS_LIMIT_PER_REQUEST = 10;
 const tweetsColRef = collection(db, 'tweets');
 const initialQueryArgs = [tweetsColRef, orderBy('timestamp', 'desc'), limit(TWEETS_LIMIT_PER_REQUEST)];
 
-
-
-
-
-export default function UseFirebaseTweets(currentUser, usersFilter) {
+export default function UseFirebaseTweets(currentUser, profilePageUserId) {
 
     const [DBTweets, setDBTweets] = useState([]);
     const [DBError, setDBError] = useState(null);
     const [tweetQueryArgs, setTweetQueryArgs] = useState(initialQueryArgs)
     const lastTweet = useRef();
     let MoreTweetDocsToDownload = useRef(true);
-    const routeLocation = useLocation();
-    const { profileUid } = useParams()
-
-  
-
-
+    const routeLocation = useLocation(); 
     const updateQueryArgs = ({ users, isPaginationOn }) => {
         const newQuery = [tweetsColRef, orderBy('timestamp', 'desc')];
+       
         if (users) {
             const whereClause = where('uid', Array.isArray(users) ? 'in' : '==', users);
             newQuery.push(whereClause);
         }
         isPaginationOn && newQuery.push(limit(TWEETS_LIMIT_PER_REQUEST));
-        console.log(newQuery);
         setTweetQueryArgs(newQuery);
     }
 
     const restoreQueryArgs = () => setTweetQueryArgs(initialQueryArgs)
-
-
 
     const getMoreTweetsFromDb = async () => {
 
@@ -144,15 +132,8 @@ export default function UseFirebaseTweets(currentUser, usersFilter) {
 
     useEffect(() => {
         if (!currentUser) return
-        const inUserPage = routeLocation.pathname.includes('/user')
-        console.log(inUserPage);
-        if (!inUserPage) {
-            updateQueryArgs({ users: null, isPaginationOn: true })
-            return
-        }
-        const profileUser = profileUid || currentUser.uid
-        updateQueryArgs({ users: profileUser, isPaginationOn: true })
-    }, [routeLocation, profileUid, currentUser]);
+        updateQueryArgs({ users: profilePageUserId, isPaginationOn: true })
+    }, [routeLocation, currentUser, profilePageUserId]);
 
 
     return (

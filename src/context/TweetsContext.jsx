@@ -1,7 +1,7 @@
 
 
 import { createContext, useState, useEffect, useRef } from "react";
-import { Link, useNavigate,  useLocation, useParams } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from "./UserContext";
 import UseFirebaseTweets from "../lib/apiFirebaseDb";
 import { } from 'react-router-dom'
@@ -18,13 +18,13 @@ const addUserData = (tweetDataDB, usersMap) => {
 }
 
 
-
 const TweetsContext = createContext();
 
 function TweetsContextProvider({ children }) {
 
     const { currentUser, usersMap } = useUser();
-    const { DBTweets, DBErrors, addServerTweet, getMoreTweetsFromDb, updateQueryArgs} = UseFirebaseTweets(currentUser)
+    const [profilePageUserId, setProfilePAgeUserId] = useState(null)
+    const { DBTweets, DBErrors, addServerTweet, getMoreTweetsFromDb, updateQueryArgs } = UseFirebaseTweets(currentUser, profilePageUserId)
     const [waitingForDb, setWaitingForDb] = useState(true);
     const [appError, setAppError] = useState(DBErrors);
     const [tweets, setTweets] = useState(DBTweets);
@@ -35,14 +35,21 @@ function TweetsContextProvider({ children }) {
     const usersFilter = useRef(null);
     const isPaginationOn = useRef(true);
     const routeLocation = useLocation();
-    const { profileUid } = useParams()
     const navigate = useNavigate();
     const inUserPage = routeLocation.pathname.includes('/user')
 
     
     useEffect(() => {
-resetQuery()
-    },[currentUser, routeLocation])
+        const inUserPage = routeLocation.pathname.includes('/user')
+        if (inUserPage) {
+            const params = routeLocation.pathname.split('/')
+            const urlUserId = params[params.indexOf('user') + 1]
+            setProfilePAgeUserId(urlUserId || currentUser?.uid )
+        } else {
+            setProfilePAgeUserId(null)
+        }
+            resetQuery()
+        }, [currentUser, routeLocation.pathname])
 
 
     const resetQuery = () => {
@@ -56,25 +63,25 @@ resetQuery()
     const searchInUsers = (term) => {
         setTabIndex(0);
         setSearchTerm('');
-        isPaginationOn.current =true
+        isPaginationOn.current = true
         inUserPage && navigate('/');
-        const UidsFound = Object.keys(usersMap).filter((uid)=>{
+        const UidsFound = Object.keys(usersMap).filter((uid) => {
             return usersMap[uid].userName.includes(term)
         })
-        if(!UidsFound) return setTweets([])
+        if (!UidsFound) return setTweets([])
         usersFilter.current = UidsFound
-        updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
+        updateQueryArgs({ users: usersFilter.current, isPaginationOn: isPaginationOn.current })
         setSearchResultsDesc(`Results search '${term}' in users:`)
     }
-    
+
     const searchInTweets = (term) => {
         console.log('searchInTweets', term);
         setSearchTerm('');
-        isPaginationOn.current =false
-        if (inUserPage) {
-            usersFilter.current = profileUid || currentUser.uid
-        }
-        updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
+        if(profilePageUserId) {
+            usersFilter.current = profilePageUserId
+        }  
+        isPaginationOn.current = false
+        updateQueryArgs({ users: usersFilter.current, isPaginationOn: isPaginationOn.current })
         setSearchTerm(term);
         setSearchResultsDesc(`Results search '${term}' in tweets:`)
     }
@@ -82,7 +89,7 @@ resetQuery()
 
 
     const isUserSet = () => {
-        if (!currentUser) {      
+        if (!currentUser) {
             const userError = <>No user found. Please <Link to='/login'>Log in</Link></>;
             setAppError(userError);
             return
@@ -117,8 +124,9 @@ resetQuery()
         const addedTweet = await addServerTweet(tweet, setAppError);//addServerTweet(tweet);
         if (addedTweet) {
             const newTweetArray = [...tweets];
-            newTweetArray.unshift({ ...addedTweet, 
-                userName: currentUser.userName, 
+            newTweetArray.unshift({
+                ...addedTweet,
+                userName: currentUser.userName,
                 photoURL: currentUser.photoURL,
             });
             setTweets(newTweetArray);
@@ -126,65 +134,67 @@ resetQuery()
         setWaitingForDb(false);
     }
 
-    const  getMoreTweets = async () => {
+    const getMoreTweets = async () => {
         setWaitingForDb(true);
         await getMoreTweetsFromDb()
         setWaitingForDb(false);
     }
 
-   
 
-    const filterTweets = ({myTweets}) => {
+
+    const filterTweets = ({ myTweets }) => {
         setSearchResultsDesc('')
         setSearchTerm('');
-        if(myTweets) {
+        if (myTweets) {
             setIsFilterApplied(true);
-            usersFilter.current =currentUser.uid
+            usersFilter.current = currentUser.uid
         } else {
             usersFilter.current = null
             setIsFilterApplied(false);
         }
         setWaitingForDb(true);
-        updateQueryArgs({users: usersFilter.current, isPaginationOn: isPaginationOn.current})
-    
+        updateQueryArgs({ users: usersFilter.current, isPaginationOn: isPaginationOn.current })
+
     }
 
-  
-    useEffect(()=>{
-        setWaitingForDb(true);
-    },[currentUser])
 
-    useEffect(()=>{
-        if(!usersMap) return
- 
-        const tweetArray = searchTerm ? 
-            DBTweets.filter(tweet=> tweet.content.includes(searchTerm))
+    useEffect(() => {
+        setWaitingForDb(true);
+    }, [currentUser])
+
+    useEffect(() => {
+        if (!usersMap) return
+
+        const tweetArray = searchTerm ?
+            DBTweets.filter(tweet => tweet.content.includes(searchTerm))
             :
-            [...DBTweets] 
+            [...DBTweets]
 
         const tweetsWithUserData = tweetArray.map(tweet => addUserData(tweet, usersMap));
         setTweets(tweetsWithUserData);
         setWaitingForDb(false);
-        },[DBTweets,usersMap,searchTerm]);
+    }, [DBTweets, usersMap, searchTerm]);
 
-        const value = {
-            tweets, 
-            isFilterApplied, 
-            addTweet,  
-            appError, 
-            waitingForDb,
-            tabIndex, 
-            searchResultsDesc,
-            setTabIndex,
-             setWaitingForDb, 
-             getMoreTweets, 
-             searchInUsers,
-             searchInTweets,
-             filterTweets }
+    const value = {
+        tweets,
+        isFilterApplied,
+        addTweet,
+        appError,
+        waitingForDb,
+        tabIndex,
+        searchResultsDesc,
+        profilePageUserId,
+        setTabIndex,
+        setWaitingForDb,
+        getMoreTweets,
+        searchInUsers,
+        searchInTweets,
+        filterTweets
+    }
 
 
     return (
-        <TweetsContext.Provider  value={value}  >
+        <TweetsContext.Provider value={value}  >
             {children}
         </TweetsContext.Provider>
 

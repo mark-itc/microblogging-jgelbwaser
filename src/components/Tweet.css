@@ -24,4 +24,13 @@
 .tweet-user-details {
     display: flex;
     align-items: center;
+    cursor: pointer;
+}
+
+a {
+    color: var(--color-txt-date);
+    text-decoration: none}
+
+a:hover {
+    color: var(--color-blue-light);
 }

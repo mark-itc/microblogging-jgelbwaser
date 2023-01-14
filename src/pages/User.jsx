@@ -1,34 +1,25 @@
-
-
 import './User.css';
+import { useContext
+ } from 'react';
 import { useUser } from '../context/UserContext';
 import { AVATAR_PIC_URL } from '../constants/constants.js';
 import TweetList from '../components/TweetList';
-//import {TweetsContext} from '../context/TweetsContext'
-
+import { TweetsContext } from '../context/TweetsContext';
 
 function User() {
-
-    const { currentUser } = useUser();
-   // const {searchInUsers} =useContext(TweetsContext)
- 
-
-    //photoURL
-    //userName
-    //email
-
- //   searchInUsers(currentUser.currentUser.uid)
-
+    const {  currentUser, usersMap } = useUser();
+    const {profilePageUserId} = useContext(TweetsContext);
+    const pageUser =  profilePageUserId? usersMap[profilePageUserId] : currentUser;
 
     return (
         <section className="section">
             <div className='user-info'>
                 <img className='profile-pic'
-                    src={currentUser.photoURL || AVATAR_PIC_URL}
+                    src={pageUser.photoURL || AVATAR_PIC_URL}
                     alt="profile-pic"
                 />
-                <h1>{currentUser.userName}</h1>
-                <h3>{currentUser.email}</h3>
+                <h1>{pageUser.userName}</h1>
+                <h3>{pageUser.email}</h3>
                 <button className='submit-btn'>Edit</button>
             </div>
             <div className='hr-with-txt-line'>

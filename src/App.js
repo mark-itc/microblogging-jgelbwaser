@@ -48,11 +48,12 @@ function App() {
       <div className="container">
         <Routes>
           <Route path='/' element={<ProtectedRoute path='/' isLoggedIn={!!currentUser} Component={Main}/>} />
-          <Route path='/user/:profileUid?' element={<ProtectedRoute path='/user' isLoggedIn={!!currentUser} Component={User}/>}/>
+          <Route path='/user/' element={<ProtectedRoute path='/user' isLoggedIn={!!currentUser} Component={User}/>}/>
+          <Route path='/user/:profileUid' element={<ProtectedRoute path='/user' isLoggedIn={!!currentUser} Component={User}/>}/>
           <Route path='/signup' element={<ProtectedRoute path='/signup' isLoggedIn={!!currentUser} Component={SignUp}/>}/>  
           <Route path='/login' element={<ProtectedRoute  path='/login' isLoggedIn={!!currentUser} Component={Login}/>}/>
           <Route path='*' element={<ProtectedRoute path='/' isLoggedIn={!!currentUser} Component={Main}/>} />
-        </Routes>
+            </Routes>
 
       </div>
     </div>

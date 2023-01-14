@@ -6,10 +6,8 @@ import { TweetsContext } from '../context/TweetsContext';
 
 
 export default function TweetList({ user }) {
-
-
+    
     const { tweets, getMoreTweets, waitingForDb,searchResultsDesc } = useContext(TweetsContext);
-
     const observer = useRef();
     const lastTweetRef = useCallback(node => {
         if (waitingForDb) return
@@ -31,7 +29,7 @@ export default function TweetList({ user }) {
             </div>
             <div className='tweet-list'>
 
-                {tweets.map(({ userName, content, date, id, photoURL }, index) => {
+                {tweets.map(({ userName, content, date, id, photoURL, uid }, index) => {
                     const isLastTweet = index + 1 === tweets.length;
                     const refProp = isLastTweet ? { ref: lastTweetRef, 'test': "value" } : {};
 
@@ -40,6 +38,7 @@ export default function TweetList({ user }) {
                         userName={userName}
                         content={content}
                         date={date}
+                        uid={uid}
                         photoURL={photoURL}
                         {...refProp}
                     />
