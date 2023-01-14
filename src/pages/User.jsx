@@ -20,7 +20,7 @@ function User() {
                 />
                 <h1>{pageUser.userName}</h1>
                 <h3>{pageUser.email}</h3>
-                <button className='submit-btn'>Edit</button>
+                {/*TODO <button className='submit-btn'>Edit</button> */}
             </div>
             <div className='hr-with-txt-line'>
                 <span className="hr-with-txt-content">USER TWEETS</span>
